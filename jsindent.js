@@ -9,7 +9,7 @@
     var jsRules = [
         {
             name: "line comment",
-            startToken: [/$\/\//, /[^\\]\/\//],
+            startToken: [/\/\//],
             endToken: [NEW_LINE_REGEX],
             ignore: true,
             indent: false
@@ -24,24 +24,46 @@
         {
             name: "regex",
             startToken: [function(string, rule) {
-                var startIndex = string.indexOf('/');
+                var re = /[,=:!&|?};][\s]*\/[^/]|^\/[^/]/;
+                var startIndex = string.search(re);
                 if (startIndex != -1) {
+                    startIndex = string.indexOf('/', startIndex);
                     var substr = string.substring(startIndex);
                     var match = searchAny(substr, rule.endToken, rule);
                     if (match.matchIndex != -1) {
-                        substr = substr.substring(match.cursor);
+                        substr = substr.substring(0, match.matchIndex);
                         try {
-                            eval(substr);
-                            return startIndex;
+                            (new RegExp(substr));
+                            return {
+                                matchIndex: startIndex,
+                                length: 1
+                            };
                         }
                         catch(e) {
-                            return -1;
+                            return {matchIndex: -1};
                         }
                     }
                 }
-                return -1;
+                return {matchIndex: -1};
             }],
-            endToken: [/[^\\]\//, /\\\\\//, /$\//, NEW_LINE_REGEX],
+            endToken: [function(string, rule) {
+                var fromIndex = 0;
+                var index = string.indexOf('/');
+                while (index != -1) {
+                    try {
+                        (new RegExp(string.substring(0, index)));
+                        break;
+                    }
+                    catch (e) {
+                        index = string.indexOf('/', fromIndex);
+                        fromIndex = index+1;
+                    }
+                }
+                return {
+                    matchIndex: index,
+                    length: index == -1 ? 0 : 1
+                };
+            }],
             ignore: true,
             indent: false,
             advance: true
@@ -72,21 +94,24 @@
         },
         {
             name: "if",
-            startToken: [/^if[\s]*\([^\)]*\)[\s]*/],
-            endToken: [/else/, /\{/, NEW_LINE_REGEX],
-            indent: true
+            startToken: [/^if[\s]*(?=\()/],
+            endToken: [/else[\s]+/, /\{/, /\;/],
+            indent: true,
+            single: true
         },
         {
-            name: "if",
-            startToken: [/^if[\s]*\([^\)]*/],
-            endToken: [/\)/],
-            indent: true
+            name: "for",
+            startToken: [/^for[\s]*(?=\()/],
+            endToken: [/\{/, /\;/],
+            indent: true,
+            single: true
         },
         {
             name: "else",
-            startToken: [/else[\s]*/],
-            endToken: [/if/, /\{/, NEW_LINE_REGEX],
-            indent: true
+            startToken: [/else[\s]+/],
+            endToken: [/if/, /\{/, /\;/],
+            indent: true,
+            single: true
         },
         {
             name: "bracket",
@@ -103,7 +128,7 @@
             advance: true
         },
         {
-            name: "bracket",
+            name: "block",
             startToken: [/\{/],
             endToken: [/\}/],
             indent: true,
@@ -117,8 +142,8 @@
         },
         {
             name: "case",
-            startToken: [/case[\s]+[^:]*[\s]*\:/],
-            endToken: [/break/, /case/, /default/, /}/],
+            startToken: [/^case[\s]+/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /\}/],
             indent: true
         }
     ];
@@ -178,11 +203,12 @@
 
         while (l < lineCount) {
             var line = lines[l].trim()+'\r\n';
+            var lineToMatch = cleanEscapedChars(line);
 
-            matchStart = matchStartRule(line, rules, pos);
+            matchStart = matchStartRule(lineToMatch, rules, pos);
 
             if (activeRules.length) {
-                matchEnd = matchEndRule(line, lastRule, pos);
+                matchEnd = matchEndRule(lineToMatch, lastRule, pos);
                 if (matchEnd.matchIndex == -1) {
                     if (lastRule.ignore) {
                         // last rule is still active, and it's telling us to ignore.
@@ -193,7 +219,7 @@
                 }
                 else if (lastRule.ignore || matchStart.matchIndex == -1 || matchEnd.matchIndex <= matchStart.matchIndex) {
                     if (matchEnd.matchIndex == 0 && lastRule.indent) {
-                        indents--;
+                        if (indents > 0) indents--;
                     }
                     else if (lastRule.indent) {
                         indentAfter--;
@@ -235,11 +261,18 @@
         function incrementLine() {
             l++;
             pos = 0;
-            if (indentAfter) {
+            if (indentAfter != 0) {
                 indents += indentAfter;
                 indentAfter = 0;
             }
+            else if (lastRule && lastRule.single && indents > 0) {
+                indents--;
+            }
         }
+    }
+
+    function cleanEscapedChars(string) {
+        return string.replace(/\\(u[0-9A-Za-z]{4}|u\{[0-9A-Za-z]{1,6}]\}|x[0-9A-Za-z]{2}|.)/g, '0');
     }
 
     function matchStartRule(string, rules, index) {
@@ -265,7 +298,7 @@
     }
 
     function matchEndRule(string, rule, offset) {
-        string = string.substring(offset, string.length);
+        string = string.substr(offset, string.length);
         var match = searchAny(string, rule.endToken, rule);
         var cursor = rule.advance ? match.matchIndex + match.matchLength : match.matchIndex;
         return {
@@ -279,94 +312,53 @@
         var length = 0;
         for (var pat,p=0; p<patterns.length; p++) {
             pat = patterns[p];
-            index = typeof pat == 'function' ? pat(string, rule) : string.search(pat);
-            if (index != -1) {
-                length = string.match(pat)[0].length;
-                break;
+            if (typeof pat == 'function') {
+                var match = pat(string, rule);
+                index = match.matchIndex;
+                length = match.length;
+            }
+            else {
+                index = string.search(pat);
+                if (index != -1) {
+                    length = string.match(pat)[0].length;
+                    break;
+                }
             }
         }
         return {
             matchIndex: index,
             matchLength: length,
+            cursor: index + length,
             patternIndex: p
         };
     }
 })(this);
 
 
-var code = `
-function calculateDifficulty() {
-      var learnedWords = w.ccmState.learnedWords.length;
-      var difficulty = -Math.cos(Math.pow(learnedWords, 0.65)) + learnedWords/100 + 1;
-        return {
-          maxChars: learnedWords < 25 ? 3 : Math.log(difficulty+1)*2+3,
-          frequencyCap: learnedWords < 100 ? 250 : learnedWords + Math.pow(difficulty+10, 2),
-          separation: learnedWords < 30 ? Math.round(learnedWords/10)+1 : Math.round(difficulty)+2,
-            moves: Math.round(Math.pow(difficulty+5, 0.5)*12 + Math.random())
-            }
-            }
-            
-            function findLinks(wd, degree, maxIndex) {
-              var results;
-              if (degree > 0) {
-                var radicals = reFindAll(wd + '(.)', w.graphData, 1, maxIndex);
-                var derived = reFindAll('(.)' + wd, w.graphData, 1, maxIndex);
-                var joined = radicals.concat(derived);
-                
-                if (degree > 1) {
-                  var sub = [];
-                  for (var i;i<joined.length;i++) {
-                    sub = sub.concat(findLinks(joined[i], degree-1));
-                  }
-                  joined = joined.concat(sub);
-                }
-                results = joined;
-              }
-              return results || [];
-            }
-            
-            function reFindAll(pattern, s, g, maxIndex) {
-              var ret = [];
-              var re = new RegExp(pattern, 'g');
-              var m;
-              while (m = re.exec(s)) {
-                if (m.index > maxIndex) {
-                  break;
-                } else {
-                  ret.push(m[g]);
-                }
-              }
-              return ret;
-            }
-            
-            function getCharByIndex(i) {
-              return w.graphData.substr(i*3, 1);
-            }
-            
-            function loadVariables() {
-              try {
-                w.ccmState = JSON.parse(localStorage.ccmState);
-              }
-              catch(e) {
-                w.ccmState = {
-                  learnedWords: "",
-                  startChar: getCharByIndex(Math.round(Math.random()*30))
-                };
-              }
-            }
-            
-            function saveVariables() {
-              localStorage.ccmState = JSON.stringify(w.ccmState);
-            }
-`
-var test = `
-      var difficulty = -Math.cos(Math.pow(learnedWords, 0.65)) + learnedWords/100 + 1;
-       var learnedWords = w.ccmState.learnedWords.length;
-      var difficulty = -Math.cos(Math.pow(learnedWords, 0.65)) + learnedWords/100 + 1;
-       `
-// console.log(10
-// /10/ 1)
-console.log(
-    this.indenter.indentJS(code, '  ')
-);
+function hereDoc(f) {
+    return f.toString().
+    replace(/^[^\/]+\/\*!?/, '').
+    replace(/\*\/[^\/]+$/, '');
+}
 
+var fs = require('fs');
+var self = this;
+var code = `
+`
+var doc = hereDoc(function() {/*!
+ var startXmlRegExp = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
+var test = 0;
+  */})
+
+
+// console.log(
+//    self.indenter.indentJS(doc, '  ')
+// );
+fs.readFile( __dirname + '/file.js', function (err, data) {
+    if (err) {
+        throw err;
+    }
+    console.log(
+        self.indenter.indentJS(data.toString(), '  ')
+    );
+});
