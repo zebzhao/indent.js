@@ -94,30 +94,34 @@
         },
         {
             name: "if",
-            startToken: [/^if[\s]*(?=\()/],
-            endToken: [/else[\s]+/, /\{/, /\;/],
-            indent: true,
-            single: true
+            startToken: [/^if[\s]*(?=\()/, /[\s]+if[\s]*(?=\()/],
+            endToken: [/else[\s]+/, /\{/, /\;/, NEW_LINE_REGEX],
+            indent: true
         },
         {
             name: "for",
             startToken: [/^for[\s]*(?=\()/],
-            endToken: [/\{/, /\;/],
-            indent: true,
-            single: true
+            endToken: [/\{/, /\;/, NEW_LINE_REGEX],
+            indent: true
         },
         {
             name: "else",
             startToken: [/else[\s]+/],
-            endToken: [/if/, /\{/, /\;/],
-            indent: true,
-            single: true
+            endToken: [/if/, /\{/, /\;/, NEW_LINE_REGEX],
+            indent: true
         },
         {
             name: "bracket",
-            startToken: [/\(/],
+            startToken: [/[^\(]\(/],
             endToken: [/\)/],
             indent: true,
+            advance: true
+        },
+        {
+            name: "bracket",
+            startToken: [/^\(/],
+            endToken: [/\)/],
+            indent: false,
             advance: true
         },
         {
@@ -219,7 +223,7 @@
                 }
                 else if (lastRule.ignore || matchStart.matchIndex == -1 || matchEnd.matchIndex <= matchStart.matchIndex) {
                     if (matchEnd.matchIndex == 0 && lastRule.indent) {
-                        if (indents > 0) indents--;
+                        indents--;
                     }
                     else if (lastRule.indent) {
                         indentAfter--;
@@ -264,9 +268,6 @@
             if (indentAfter != 0) {
                 indents += indentAfter;
                 indentAfter = 0;
-            }
-            else if (lastRule && lastRule.single && indents > 0) {
-                indents--;
             }
         }
     }
@@ -346,19 +347,26 @@ var self = this;
 var code = `
 `
 var doc = hereDoc(function() {/*!
- var startXmlRegExp = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
-var test = 0;
+ if ((insideRule || enteringConditionalGroup) &&
+ !(lookBack("&") || foundNestedPseudoClass()) &&
+ !lookBack("(")) {
+ // 'property: value' delimiter
+ // which could be in a conditional group query
+ insidePropertyValue = true;
+ output.push(':');
+ print.singleSpace();
+ }
   */})
 
 
-// console.log(
-//    self.indenter.indentJS(doc, '  ')
-// );
-fs.readFile( __dirname + '/file.js', function (err, data) {
-    if (err) {
-        throw err;
-    }
-    console.log(
-        self.indenter.indentJS(data.toString(), '  ')
-    );
-});
+console.log(
+   self.indenter.indentJS(doc, '  ')
+);
+// fs.readFile( __dirname + '/file.js', function (err, data) {
+//     if (err) {
+//         throw err;
+//     }
+//     console.log(
+//         self.indenter.indentJS(data.toString(), '  ')
+//     );
+// });
