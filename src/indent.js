@@ -163,6 +163,14 @@
             advance: true
         },
         {
+            name: "link|br",
+            startToken: [/\<(link|br|input)/i],
+            endToken: [/(\"[^\"]*\"|'[^']*'|[^'\">])*>/],
+            ignore: true,
+            indent: false,
+            advance: true
+        },
+        {
             name: "tag",
             startToken: [/<(\"[^\"]*\"|'[^']*'|[^'\">])*>/],
             endToken: [/\<\/[^\>]+\>/],
