@@ -1,0 +1,40 @@
+{
+  "name": "indent.js",
+  "version": "0.1.0",
+  "description": "Fast minimalistic auto indentation of JavaScript, CSS, and HTML.",
+  "main": "indent.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine-core": "^2.2.0",
+    "karma": "^0.12.31",
+    "karma-coverage": "^0.3.1",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "gulp": "^3.9",
+    "gulp-clean": "^0.3.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-uglify": "^1.4.1"
+  },
+  "scripts": {
+    "test": "karma start karma.conf.js --single-run",
+    "start": "http-server -a localhost -p 8123 -c-1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://zebzhao@bitbucket.org/jswriter/jsindenter.git"
+  },
+  "keywords": [
+    "indent",
+    "small",
+    "reformat",
+    "js",
+    "css",
+    "html"
+  ],
+  "author": "Zeb Zhao",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/jswriter/jsindenter#readme"
+}
