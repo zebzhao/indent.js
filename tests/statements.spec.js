@@ -123,4 +123,29 @@ do {
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
     });
+
+    it('should handle single line statements', function() {
+        var input =  hereDoc(function() {/*!
+if (test)
+execute();
+if (test)
+if (is) {var t=0}
+else var s=0;
+for(var i=0)
+execute();
+*/
+        });
+        var expected = hereDoc(function() {/*!
+if (test)
+  execute();
+if (test)
+  if (is) {var t=0}
+  else var s=0;
+for(var i=0)
+  execute();
+
+*/
+        });
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
 });
