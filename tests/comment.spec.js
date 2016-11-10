@@ -31,4 +31,25 @@ if (last_type !== 'TK_END_EXPR') {
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
     });
+
+
+    it('should ignore multiline comment', function() {
+        var input = hereDoc(function() {/*!
+/**
+* Create key-value caches of limited size
+* @returns {function(string, object)} Returns the Object data after storing it on itself with
+*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+*	deleting the oldest entry
+*/
+        }) + '*/';
+        var expected = hereDoc(function() {/*!
+/**
+* Create key-value caches of limited size
+* @returns {function(string, object)} Returns the Object data after storing it on itself with
+*	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+*	deleting the oldest entry
+*/
+        }) + '*/\r\n';
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
 });
