@@ -1,5 +1,5 @@
 (function(exports) {
-    exports.indenter = {
+    exports.indent = {
         indentCSS: indentJS,
         indentJS: indentJS,
         indentHTML: indentHTML
@@ -24,7 +24,7 @@
         {
             name: "regex",
             startToken: [function(string, rule) {
-                var re = /[,=:!&|?};][\s]*\/[^/]|^\/[^/]/;
+                var re = /[(,=:[!&|?{};][\s]*\/[^/]|^[\s]*\/[^/]/;
                 var startIndex = string.search(re);
                 if (startIndex != -1) {
                     startIndex = string.indexOf('/', startIndex);
@@ -112,16 +112,9 @@
         },
         {
             name: "bracket",
-            startToken: [/[^\(]\(/],
+            startToken: [/\(/],
             endToken: [/\)/],
             indent: true,
-            advance: true
-        },
-        {
-            name: "bracket",
-            startToken: [/^\(/],
-            endToken: [/\)/],
-            indent: false,
             advance: true
         },
         {
@@ -141,7 +134,7 @@
         {
             name: "var",
             startToken: [/var[\s]+/],
-            endToken: [/\;/, /\=/],
+            endToken: [/\;/],
             indent: true
         },
         {
@@ -197,10 +190,10 @@
         var lines = code.split(/[\r]?\n/gi);
         var lineCount = lines.length;
         var newLines = [];
-        var indents = 0;
-        var indentAfter = 0;
+        var indentBuffer = [];
         var activeRules = [];
         var lastRule;
+        var indents = 0;
         var l = 0;
         var pos = 0;
         var matchEnd, matchStart;
@@ -216,17 +209,16 @@
                 if (matchEnd.matchIndex == -1) {
                     if (lastRule.ignore) {
                         // last rule is still active, and it's telling us to ignore.
-                        newLines[l] = getIndentation() + line;
                         incrementLine();
                         continue;
                     }
                 }
                 else if (lastRule.ignore || matchStart.matchIndex == -1 || matchEnd.matchIndex <= matchStart.matchIndex) {
-                    if (matchEnd.matchIndex == 0 && lastRule.indent) {
-                        indents--;
-                    }
-                    else if (lastRule.indent) {
-                        indentAfter--;
+                    if (lastRule.indent) {
+                        consumeIndentation();
+                        if (matchEnd.matchIndex == 0) {
+                            calculateIndents();
+                        }
                     }
                     pos = matchEnd.cursor;
                     removeLastRule();
@@ -239,7 +231,6 @@
             }
             else {
                 // No new token match end, no new match start
-                newLines[l] = getIndentation() + line;
                 incrementLine();
             }
         }
@@ -250,7 +241,8 @@
             pos = match.cursor;
             lastRule = match.rule;
             activeRules.push(lastRule);
-            if (lastRule.indent) indentAfter++;
+            if (lastRule.indent)
+                incrementIndentation();
         }
 
         function removeLastRule() {
@@ -258,18 +250,49 @@
             lastRule = activeRules[activeRules.length-1];
         }
 
-        function getIndentation() {
-            return (new Array(indents+1)).join(indentation);
+        function calculateIndents() {
+            indents = 0;
+            for (var b,i=0; i<indentBuffer.length; i++) {
+                b = indentBuffer[i];
+                if (b.open && b.line != l)
+                    indents++;
+            }
         }
 
         function incrementLine() {
+            newLines[l] = repeatString(indentation, indents) + line;
             l++;
             pos = 0;
-            if (indentAfter != 0) {
-                indents += indentAfter;
-                indentAfter = 0;
+            calculateIndents();
+        }
+
+        function incrementIndentation() {
+            var matched = indentBuffer[indentBuffer.length-1];
+            if (matched && matched.line == l) {
+                matched.indent++;
+            }
+            else {
+                indentBuffer.push({
+                    indent: 1,
+                    open: true,
+                    line: l
+                });
             }
         }
+
+        function consumeIndentation() {
+            var lastElem = indentBuffer[indentBuffer.length-1];
+            if (lastElem) {
+                lastElem.open = l == lastElem.line;
+                if (--lastElem.indent <= 0) {
+                    indentBuffer.pop();
+                }
+            }
+        }
+    }
+ 
+    function repeatString(baseString, repeat) {
+        return (new Array(repeat+1)).join(baseString);
     }
 
     function cleanEscapedChars(string) {
@@ -334,39 +357,3 @@
         };
     }
 })(this);
-
-
-function hereDoc(f) {
-    return f.toString().
-    replace(/^[^\/]+\/\*!?/, '').
-    replace(/\*\/[^\/]+$/, '');
-}
-
-var fs = require('fs');
-var self = this;
-var code = `
-`
-var doc = hereDoc(function() {/*!
- if ((insideRule || enteringConditionalGroup) &&
- !(lookBack("&") || foundNestedPseudoClass()) &&
- !lookBack("(")) {
- // 'property: value' delimiter
- // which could be in a conditional group query
- insidePropertyValue = true;
- output.push(':');
- print.singleSpace();
- }
-  */})
-
-
-console.log(
-   self.indenter.indentJS(doc, '  ')
-);
-// fs.readFile( __dirname + '/file.js', function (err, data) {
-//     if (err) {
-//         throw err;
-//     }
-//     console.log(
-//         self.indenter.indentJS(data.toString(), '  ')
-//     );
-// });
