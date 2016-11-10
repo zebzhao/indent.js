@@ -28,7 +28,7 @@
                 var startIndex = string.search(re);
                 if (startIndex != -1) {
                     startIndex = string.indexOf('/', startIndex);
-                    var substr = string.substring(startIndex);
+                    var substr = string.substring(startIndex+1);
                     var match = searchAny(substr, rule.endToken, rule);
                     if (match.matchIndex != -1) {
                         substr = substr.substring(0, match.matchIndex);
@@ -290,7 +290,7 @@
             }
         }
     }
- 
+
     function repeatString(baseString, repeat) {
         return (new Array(repeat+1)).join(baseString);
     }
