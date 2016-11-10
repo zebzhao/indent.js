@@ -95,13 +95,13 @@
         {
             name: "if",
             startToken: [/^if[\s]*(?=\()/, /[\s]+if[\s]*(?=\()/],
-            endToken: [/else[\s]+/, /\{/, /\;/, NEW_LINE_REGEX],
+            endToken: [/else[\s]+/, /\{/, /\;/],
             indent: true
         },
         {
             name: "for",
             startToken: [/^for[\s]*(?=\()/],
-            endToken: [/\{/, /\;/, NEW_LINE_REGEX],
+            endToken: [/\{/, /\;/],
             indent: true
         },
         {
