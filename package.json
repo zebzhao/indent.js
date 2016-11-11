@@ -1,7 +1,7 @@
 {
   "name": "indent.js",
   "version": "0.1.0",
-  "description": "Fast minimalistic auto indentation of JavaScript, CSS, and HTML.",
+  "description": "Fast minimalistic pure indentation of JavaScript, CSS, and HTML.",
   "main": "indent.js",
   "directories": {
     "test": "tests",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://zebzhao@bitbucket.org/jswriter/jsindenter.git"
+    "url": "https://github.com/zebzhao/indent.js.git"
   },
   "keywords": [
     "indent",
@@ -40,5 +40,5 @@
   ],
   "author": "Zeb Zhao",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/jswriter/jsindenter#readme"
+  "homepage": "https://github.com/zebzhao/indent.js"
 }
