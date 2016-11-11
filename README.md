@@ -4,14 +4,19 @@
 
 Fast minimalistic pure indentation of JavaScript, CSS, and HTML.
 
-[Online Demo](https://zebzhao.github.io/indent.js/)
+[Online indent.js demo](https://zebzhao.github.io/indent.js/)
 
 ---
 
 You have following options to get indent.js:
 
-1. Install with [Bower](http://bower.io): ```bower install indent.js```
+1. Install with [bower](http://bower.io): ```bower install indent.js```
 2. Install with [npm](https://www.npmjs.com): ```npm install indent.js```
+
+### Download
+
+* [Minified (~4 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
+* [Not minified (~11 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
 
 Usage
 ---

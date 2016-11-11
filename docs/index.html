@@ -1,55 +1,170 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>indent.js by zebzhao</title>
+    <title>indent.js</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/github-dark.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/main.js"></script>
+    <script src="javascripts/indent.min.js"></script>
     <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  </head>
-  <body>
+</head>
+<body>
 
-      <header>
-        <h1>indent.js</h1>
-        <p>Fast minimalistic pure indentation of JavaScript, CSS, and HTML.</p>
-      </header>
+<header>
+    <h1>indent.js</h1>
+</header>
 
-      <div id="banner">
-        <span id="logo"></span>
+<div id="banner">
+    <span id="logo"></span>
 
-        <a href="https://github.com/zebzhao/indent.js" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/zebzhao/indent.js/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/zebzhao/indent.js/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
+    <a href="https://github.com/zebzhao/indent.js" class="button fork"><strong>View On GitHub</strong></a>
+    <!--<div class="downloads">-->
+        <!--<span>Downloads:</span>-->
+        <!--<ul>-->
+            <!--<li><a href="https://github.com/zebzhao/indent.js/zipball/master" class="button">ZIP</a></li>-->
+            <!--<li><a href="https://github.com/zebzhao/indent.js/tarball/master" class="button">TAR</a></li>-->
+        <!--</ul>-->
+    <!--</div>-->
+</div><!-- end banner -->
 
-    <div class="wrapper">
-      <nav>
+<div class="wrapper">
+    <nav>
         <ul></ul>
-      </nav>
-      <section>
+    </nav>
+    <section>
         <h3>
-<a id="a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" class="anchor" href="#a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A code indenter built to only indent code while preserving everything else.</h3>
+            <a id="a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" class="anchor" href="#a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
+            A code indenter built to only indent code while preserving everything else.</h3>
 
-<p>This tool will not re-space your code, output proper js-lint compatible code (like forcing object properties to be on separate lines). It works with any combination of CSS, JavaScript, HTML, and perhaps even several other languages.</p>
-      </section>
-      <footer>
+        <p>This tool will not output proper js-lint compatible code (like forcing object properties to be on separate lines). It works with any combination of CSS, JavaScript, HTML, and perhaps even several other languages.</p>
+        <table>
+            <tr>
+                <td>
+                    <label>Indent with</label>
+                    <select id="indentWithSelect">
+                        <option value="\t" selected="selected">Tab</option>
+                        <option value=" ">1 Space</option>
+                        <option value="  ">2 Spaces</option>
+                        <option value="   ">3 Spaces</option>
+                        <option value="    ">4 Spaces</option>
+                        <option value="     ">5 Spaces</option>
+                        <option value="      ">6 Spaces</option>
+                        <option value="       ">7 Spaces</option>
+                        <option value="        ">8 Spaces</option>
+                        <option value="         ">9 Spaces</option>
+                        <option value="          ">10 Spaces</option>
+                    </select>
+                </td>
+                <td>
+                    <button style="width:100%;height:35px" onclick="reformatCode()">Reindent Code</button>
+                </td>
+            </tr>
+        </table>
+        <textarea id="codeTextArea" rows="20" style="width:100%;" wrap="off">
+/**
+Code taken from js-beautify project
+*/
+function handle_start_block() {
+// Check if this is should be treated as a ObjectLiteral
+var next_token = get_token(1);
+var second_token = get_token(2);
+if (second_token && (
+(in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) ||
+(in_array(next_token.text, ['get', 'set']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
+)) {
+// We don't support TypeScript,but we didn't break it for a very long time.
+// We'll try to keep not breaking it.
+if (!in_array(last_last_text, ['class', 'interface'])) {
+set_mode(MODE.ObjectLiteral);
+} else {
+set_mode(MODE.BlockStatement);
+}
+} else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
+// arrow function: (param1, paramN) => { statements }
+set_mode(MODE.BlockStatement);
+} else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
+(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import', 'default']))
+) {
+// Detecting shorthand function syntax is difficult by scanning forward,
+//     so check the surrounding context.
+// If the block is being returned, imported, export default, passed as arg,
+//     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
+set_mode(MODE.ObjectLiteral);
+} else {
+set_mode(MODE.BlockStatement);
+}
+
+var empty_braces = !next_token.comments_before.length && next_token.text === '}';
+var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
+last_type === 'TK_END_EXPR';
+
+
+if (opt.brace_style === "expand" ||
+(opt.brace_style === "none" && current_token.wanted_newline)) {
+if (last_type !== 'TK_OPERATOR' &&
+(empty_anonymous_function ||
+last_type === 'TK_EQUALS' ||
+(last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
+output.space_before_token = true;
+} else {
+print_newline(false, true);
+}
+} else { // collapse
+if (opt.brace_style === 'collapse-preserve-inline') {
+// search forward for a newline wanted inside this block
+var index = 0;
+var check_token = null;
+flags.inline_frame = true;
+do {
+index += 1;
+check_token = get_token(index);
+if (check_token.wanted_newline) {
+    flags.inline_frame = false;
+    break;
+}
+} while (check_token.type !== 'TK_EOF' &&
+!(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token));
+}
+
+if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
+// if we're preserving inline,
+// allow newline between comma and next brace.
+if (last_type === 'TK_COMMA' || opt.space_in_paren) {
+output.space_before_token = true;
+}
+
+if (opt.brace_style === 'collapse-preserve-inline' &&
+(last_type === 'TK_COMMA' || (last_type === 'TK_START_EXPR' && flags.inline_frame))) {
+allow_wrap_or_preserved_newline();
+previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
+flags.multiline_frame = false;
+}
+} else if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
+if (last_type === 'TK_START_BLOCK') {
+print_newline();
+} else {
+output.space_before_token = true;
+}
+}
+}
+print_token();
+indent();
+}</textarea>
+
+    </section>
+    <footer>
         <p>Project maintained by <a href="https://github.com/zebzhao">zebzhao</a></p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
+    </footer>
+</div>
+<!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+</body>
 </html>
