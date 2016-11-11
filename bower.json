@@ -11,6 +11,7 @@
     "package.json",
     "tests",
     "tools",
+    "docs",
     "bower.json",
     ".gitignore",
     ".travis.yml"
