@@ -1,0 +1,6 @@
+{
+  "name": "indent.js",
+  "tagline": "Fast minimalistic pure indentation of JavaScript, CSS, and HTML.",
+  "body": "### A code indenter built to only indent code while preserving everything else.\r\nThis tool will not re-space your code, output proper js-lint compatible code (like forcing object properties to be on separate lines). It works with any combination of CSS, JavaScript, HTML, and perhaps even several other languages.",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
