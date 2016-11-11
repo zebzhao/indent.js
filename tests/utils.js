@@ -1,4 +1,3 @@
-var indent = this.indent;
 function hereDoc(f) {
     return f.toString()
         .replace(/^[^\/]+\/\*!?/, '')
