@@ -1,10 +1,4 @@
-(function(exports) {
-    exports.indent = {
-        indentCSS: indentJS,
-        indentJS: indentJS,
-        indentHTML: indentHTML
-    };
-
+var indent = (function() {
     var NEW_LINE_REGEX = /\r*\n/;
     var jsRules = [
         {
@@ -23,12 +17,12 @@
         },
         {
             name: "regex",
-            startToken: [function(string, rule) {
+            startToken: [function (string, rule) {
                 var re = /[(,=:[!&|?{};][\s]*\/[^/]|^[\s]*\/[^/]/;
                 var startIndex = string.search(re);
                 if (startIndex != -1) {
                     startIndex = string.indexOf('/', startIndex);
-                    var substr = string.substring(startIndex+1);
+                    var substr = string.substring(startIndex + 1);
                     var match = searchAny(substr, rule.endToken, rule);
                     if (match.matchIndex != -1) {
                         substr = substr.substring(0, match.matchIndex);
@@ -39,14 +33,14 @@
                                 length: 1
                             };
                         }
-                        catch(e) {
+                        catch (e) {
                             return {matchIndex: -1};
                         }
                     }
                 }
                 return {matchIndex: -1};
             }],
-            endToken: [function(string, rule) {
+            endToken: [function (string, rule) {
                 var fromIndex = 0;
                 var index = string.indexOf('/');
                 while (index != -1) {
@@ -56,7 +50,7 @@
                     }
                     catch (e) {
                         index = string.indexOf('/', fromIndex);
-                        fromIndex = index+1;
+                        fromIndex = index + 1;
                     }
                 }
                 return {
@@ -163,8 +157,8 @@
             advance: true
         },
         {
-            name: "link|br",
-            startToken: [/\<(link|br|input)/i],
+            name: "link|br|input|meta",
+            startToken: [/\<(link|br|input|meta)/i],
             endToken: [/(\"[^\"]*\"|'[^']*'|[^'\">])*>/],
             ignore: true,
             indent: false,
@@ -185,6 +179,12 @@
             advance: true
         }
     ].concat(jsRules);
+
+    return {
+        indentCSS: indentJS,
+        indentJS: indentJS,
+        indentHTML: indentHTML
+    };
 
     function indentJS(code, indentString) {
         return indent(code, jsRules, indentString);
@@ -207,7 +207,7 @@
         var matchEnd, matchStart;
 
         while (l < lineCount) {
-            var line = lines[l].trim()+'\r\n';
+            var line = lines[l].trim() + '\r\n';
             var lineToMatch = cleanEscapedChars(line);
 
             matchStart = matchStartRule(lineToMatch, rules, pos);
@@ -255,12 +255,12 @@
 
         function removeLastRule() {
             activeRules.pop();
-            lastRule = activeRules[activeRules.length-1];
+            lastRule = activeRules[activeRules.length - 1];
         }
 
         function calculateIndents() {
             indents = 0;
-            for (var b,i=0; i<indentBuffer.length; i++) {
+            for (var b, i = 0; i < indentBuffer.length; i++) {
                 b = indentBuffer[i];
                 if (b.open && b.line != l)
                     indents++;
@@ -275,7 +275,7 @@
         }
 
         function incrementIndentation() {
-            var matched = indentBuffer[indentBuffer.length-1];
+            var matched = indentBuffer[indentBuffer.length - 1];
             if (matched && matched.line == l) {
                 matched.indent++;
             }
@@ -289,7 +289,7 @@
         }
 
         function consumeIndentation() {
-            var lastElem = indentBuffer[indentBuffer.length-1];
+            var lastElem = indentBuffer[indentBuffer.length - 1];
             if (lastElem) {
                 lastElem.open = l == lastElem.line;
                 if (--lastElem.indent <= 0) {
@@ -300,7 +300,7 @@
     }
 
     function repeatString(baseString, repeat) {
-        return (new Array(repeat+1)).join(baseString);
+        return (new Array(repeat + 1)).join(baseString);
     }
 
     function cleanEscapedChars(string) {
@@ -313,7 +313,7 @@
         var minIndex = string.length;
         var minMatch;
         var match;
-        for (var rule,r=0; r<rules.length; r++) {
+        for (var rule, r = 0; r < rules.length; r++) {
             rule = rules[r];
             match = searchAny(string, rule.startToken, rule);
             if (match.matchIndex != -1 && match.matchIndex < minIndex) {
@@ -342,7 +342,7 @@
     function searchAny(string, patterns, rule) {
         var index = -1;
         var length = 0;
-        for (var pat,p=0; p<patterns.length; p++) {
+        for (var pat, p = 0; p < patterns.length; p++) {
             pat = patterns[p];
             if (typeof pat == 'function') {
                 var match = pat(string, rule);
@@ -364,4 +364,4 @@
             patternIndex: p
         };
     }
-})(this);
+}());
