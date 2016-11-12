@@ -2,6 +2,7 @@
   "name": "indent.js",
   "version": "0.1.0",
   "homepage": "https://github.com/zebzhao/indent.js",
+  "main": "lib/indent.js",
   "dependencies": {
   },
   "ignore": [
