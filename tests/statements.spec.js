@@ -26,7 +26,6 @@ switch (process.env.TEST_SUITE) {
     generateExtendPrototypeTests();
   break;
 }
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -56,7 +55,6 @@ if ((insideRule || enteringConditionalGroup) &&
   output.push(':');
   print.singleSpace();
 }
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -96,7 +94,6 @@ var
   rkeyEvent = /^key/,
   rmouseEvent = /^(?:mouse|pointer|contextmenu|drag|drop)|click/,
   rtypenamespace = /^([^.]*)(?:\.(.+)|)/;
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -118,7 +115,6 @@ do {
 } while (
   scale !== ( scale = currentValue() / initial ) && scale !== 1 && --maxIterations
 );
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -143,7 +139,6 @@ if (test)
   else var s=0;
 for(var i=0)
   execute();
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
