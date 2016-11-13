@@ -270,7 +270,6 @@ var _gaq = [
     </script>
   </body>
 </html>
-
 */
         });
         var actual = indent.indentHTML(input, '  ');

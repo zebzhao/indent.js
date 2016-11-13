@@ -18,7 +18,6 @@ var parenLevel = 0;
     var parenLevel = 0;
   }
 })();
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
