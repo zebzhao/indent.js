@@ -26,7 +26,6 @@ if (last_type !== 'TK_END_EXPR') {
     }
   }
 }
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -49,7 +48,7 @@ if (last_type !== 'TK_END_EXPR') {
 *	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
 *	deleting the oldest entry
 */
-        }) + '*/\r\n';
+        }) + '*/';
         expect(indent.indentJS(input, '  ')).toEqual(expected);
     });
 });

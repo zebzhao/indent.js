@@ -12,7 +12,6 @@ var pnum = ( /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/ ).source;
 var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 var rtagName = ( /<([\w:-]+)/ );
 var rscriptType = ( /^$|\/(?:java|ecma)script/i );
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -28,7 +27,6 @@ followingDoc();
         var expected = hereDoc(function() {/*!
 var startXmlRegExp = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
 followingDoc();
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
@@ -92,7 +90,6 @@ return {matchIndex: -1};
     return {matchIndex: -1};
   }]
 }
-
 */
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
