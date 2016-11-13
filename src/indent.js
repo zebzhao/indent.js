@@ -207,8 +207,8 @@ var indent = (function() {
         var matchEnd, matchStart;
 
         while (l < lineCount) {
-            var line = lines[l].trim() + '\r\n';
-            var lineToMatch = cleanEscapedChars(line);
+            var line = lines[l].trim();
+            var lineToMatch = cleanEscapedChars(line) + '\r\n';
 
             matchStart = matchStartRule(lineToMatch, rules, pos);
 
@@ -243,7 +243,7 @@ var indent = (function() {
             }
         }
 
-        return newLines.join("");
+        return newLines.join('\r\n');
 
         function implementRule(match) {
             pos = match.cursor;

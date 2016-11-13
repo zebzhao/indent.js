@@ -20,7 +20,6 @@ transform: translate3d(0,0,0);
     transform: translate3d(0,0,0);
   }
 }
-
 */
         });
         expect(indent.indentCSS(input, '  ')).toEqual(expected);
