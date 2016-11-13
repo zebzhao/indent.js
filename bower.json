@@ -1,6 +1,6 @@
 {
   "name": "indent.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/zebzhao/indent.js",
   "main": "lib/indent.js",
   "dependencies": {
