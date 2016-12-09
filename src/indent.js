@@ -63,7 +63,7 @@ var indent = (function() {
             langs: "html",
             name: "tag",
             startToken: [/>/],
-            endToken: [/<\/[A-Za-z0-9\-]+/],
+            endToken: [/<\/[A-Za-z0-9\-]+>/],
             indent: true,
             advance: true
         },
