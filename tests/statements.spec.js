@@ -143,4 +143,22 @@ for(var i=0)
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
     });
+
+    it('should handle terminate bracket on same line', function() {
+        var input =  hereDoc(function() {/*!
+if (test) {
+cool();}
+else if (test) {
+cool();}
+*/
+        });
+        var expected = hereDoc(function() {/*!
+if (test) {
+  cool();}
+else if (test) {
+  cool();}
+*/
+        });
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
 });
