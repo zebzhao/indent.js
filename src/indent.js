@@ -233,7 +233,7 @@ var indent = (function() {
         },
         {
             langs: "js",
-            name: "dotchain",
+            name: "dot chain",
             startToken: [/^\../],
             endToken: [/;/, NEW_LINE_REGEX],
             indent: true,
@@ -242,9 +242,14 @@ var indent = (function() {
         },
         {
             langs: "js",
-            name: "dotchain",
-            startToken: [/\..\s*$/],
-            endToken: [/;/, NEW_LINE_REGEX],
+            name: "dot chain",
+            startToken: [/\.\s*$/],
+            endToken: [function (string, rule) {
+                return {
+                    matchIndex: string.length ? 1 : -1,
+                    length: string.length ? 0 : 1
+                };
+            }],
             indent: true
         },
         {
