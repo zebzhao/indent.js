@@ -6,6 +6,6 @@ fs.readFile( __dirname + '/file.js', function (err, data) {
     if (err)
         throw err;
     console.log(
-        indent.indentJS(data.toString(), '  ')
+        indent.indentHTML(data.toString(), '  ')
     );
 });
