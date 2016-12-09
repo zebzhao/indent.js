@@ -194,10 +194,10 @@ var _gaq = [
         var st = new SanityTest();
         Urlencoded.run_tests(st);
         var results = st.results_raw()
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/ /g, '&nbsp;');
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/ /g, '&nbsp;');
         $('#testresults').html(results).show();
       }
       function read_settings_from_cookie() {

@@ -1,6 +1,11 @@
 var indent = (function() {
+    var rulesCache = {};
+
     function filterRules(language) {
+        if (rulesCache[language])
+            return rulesCache[language];
         var ret = [];
+        rulesCache[language] = ret;
         for (var i=0; i<masterRules.length; i++) {
             if (masterRules[i].langs.indexOf(language.toLowerCase()) != -1)
                 ret.push(masterRules[i]);
@@ -48,9 +53,54 @@ var indent = (function() {
         },
         {
             langs: "html",
+            name: "mode switch js",
+            startToken: [function (string, rule) {
+                var start = /<script[\s>].*/i;
+                var end = /<\/script>/i;
+                var startMatch = start.exec(string);
+                var endMatch = end.exec(string);
+
+                if (startMatch && (!endMatch || endMatch.index < startMatch.index)) {
+                    return {
+                        matchIndex: startMatch.index,
+                        length: startMatch[0].length
+                    };
+                }
+                return {matchIndex: -1};
+            }],
+            endToken: [/<\/script>/i],
+            rules: "js",
+            advance: true,
+            indent: true
+        },
+        {
+            langs: "html",
+            name: "mode switch css",
+            startToken: [function (string, rule) {
+                var start = /<style[\s>].*/i;
+                var end = /<\/style>/i;
+                var startMatch = start.exec(string);
+                var endMatch = end.exec(string);
+
+                if (startMatch && (!endMatch || endMatch.index < startMatch.index)) {
+                    return {
+                        matchIndex: startMatch.index,
+                        length: startMatch[0].length
+                    };
+                }
+                return {matchIndex: -1};
+            }],
+            endToken: [/<\/style>/i],
+            rules: "css",
+            advance: true,
+            indent: true
+        },
+        {
+            langs: "html",
             name: "close-tag",
             startToken: [/<\/[A-Za-z0-9\-]+>/],
-            endToken: [/./]
+            endToken: [/./],
+            indent: true
         },
         {
             langs: "html",
@@ -247,7 +297,7 @@ var indent = (function() {
         return indent(code, filterRules('html'), indentString);
     }
 
-    function indent(code, rules, indentation) {
+    function indent(code, baseRules, indentation) {
         var lines = code.split(/[\r]?\n/gi);
         var lineCount = lines.length;
         var newLines = [];
@@ -258,12 +308,13 @@ var indent = (function() {
         var l = 0;
         var pos = 0;
         var matchEnd, matchStart;
+        var modeRules = null;
 
         while (l < lineCount) {
             var line = lines[l].trim();
             var lineToMatch = cleanEscapedChars(line) + '\r\n';
 
-            matchStart = matchStartRule(lineToMatch, rules, pos);
+            matchStart = matchStartRule(lineToMatch, modeRules || baseRules, pos);
 
             if (activeRules.length) {
                 matchEnd = matchEndRule(lineToMatch, lastRule, pos);
@@ -275,14 +326,8 @@ var indent = (function() {
                     }
                 }
                 else if (lastRule.ignore || matchStart.matchIndex == -1 || matchEnd.matchIndex <= matchStart.matchIndex) {
-                    if (lastRule.indent) {
-                        consumeIndentation();
-                        if (matchEnd.matchIndex == 0) {
-                            calculateIndents();
-                        }
-                    }
-                    pos = matchEnd.cursor;
                     removeLastRule();
+                    pos = matchEnd.cursor;
                     continue;  // Repeat process for matching line start/end
                 }
             }
@@ -302,11 +347,24 @@ var indent = (function() {
             pos = match.cursor;
             lastRule = match.rule;
             activeRules.push(lastRule);
-            if (lastRule.indent)
+            if (lastRule.indent) {
                 incrementIndentation(lastRule.lineOffset);
+            }
+            if (lastRule.rules) {
+                modeRules = filterRules(lastRule.rules);
+            }
         }
 
         function removeLastRule() {
+            if (lastRule.indent) {
+                consumeIndentation();
+                if (matchEnd.matchIndex == 0) {
+                    calculateIndents();
+                }
+            }
+            if (lastRule.rules) {
+                modeRules = null;
+            }
             activeRules.pop();
             lastRule = activeRules[activeRules.length - 1];
         }
