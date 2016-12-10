@@ -42,8 +42,60 @@ var indented = indent.indentJS(code, '  ');
 console.log(indented);
 ```
 
+Comparing with Beautifying
+---
+
+Where Beautify.js aims to reverse uglify and output js-hint or js-lint compatible syntax, sometimes it
+does a little too much if your goal is to just reindent your code.
+
+Below are some cases that beautify.js does not handle things so well that indent.js handles with ease.
+
+### Beautify
+```javascript
+```
+
+### Indent.js
+```javascript
+```
+
+### Beautify
+```javascript
+```
+
+### Indent.js
+```javascript
+```
+
+### Beautify
+```javascript
+```
+
+### Indent.js
+```javascript
+```
+
+---
+
+This project is great for code editors and file watchers. I'd love to hear about how your projects use indent.js.
+
+##Projects with indent.js:
+
+1. [JsWriter - Web-base JavaScript IDE](https://jswriter.com/)
+
 Developers
 ---
+
+ISupport for other languages would be nice, and greatly welcomed!
+Unfortunately, I do not know these languages well enough to construct rules for them.
+
+###Languages still not supported:
+
+1. TypeScript
+2. CoffeeScript
+3. Pug
+4. Less/Sass
+
+###Getting the project
 
 1. Run `npm install` to install dependencies
 2. Run `npm test` to run tests in `tests` folder

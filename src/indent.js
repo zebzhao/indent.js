@@ -226,7 +226,7 @@ var indent = (function() {
         {
             langs: "js css",
             name: "bracket",
-            startToken: [/\(/],
+            startToken: [/\([\s]*(var)?/],
             endToken: [/\)/],
             indent: true,
             advance: true
