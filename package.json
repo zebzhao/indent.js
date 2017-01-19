@@ -1,6 +1,6 @@
 {
   "name": "indent.js",
-  "version": "0.1.3",
+  "version": "0.3.0",
   "description": "Fast minimalistic pure indentation of JavaScript, CSS, and HTML.",
   "main": "lib/indent.js",
   "directories": {
@@ -31,12 +31,15 @@
     "url": "https://github.com/zebzhao/indent.js.git"
   },
   "keywords": [
+    "beautifier",
     "indent",
-    "indent.js",
-    "indenter",
-    "indentjs",
-    "indentcss",
-    "indenthtml"
+    "jsx",
+    "tsx",
+    "typescript",
+    "harmony",
+    "pure",
+    "unopinionated",
+    "indentation"
   ],
   "author": "Zeb Zhao",
   "license": "MIT",

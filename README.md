@@ -1,8 +1,8 @@
-# indent.js
+# indent.js - pure code indentation for jsx, tsx, ts, js, html, css, less, scss
 
 [![Build Status](https://travis-ci.org/zebzhao/indent.js.svg?branch=master)](https://travis-ci.org/zebzhao/indent.js)
 
-Fast minimalistic pure indentation of JavaScript, CSS, and HTML.
+Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying of your code, leave it as it is, only correctly indents it following some basic rules.
 
 [Online indent.js demo](https://zebzhao.github.io/indent.js/)
 
@@ -13,12 +13,13 @@ You have following options to get indent.js:
 1. Install with [bower](http://bower.io): ```bower install indent.js```
 2. Install with [npm](https://www.npmjs.com): ```npm install indent.js```
 
-### Download
+## Download
 
-* [Minified (~4 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
-* [Not minified (~11 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
+* [Minified (~5 kB) no gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
+* [Not minified (~11 kB) no gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
 
-Usage
+
+## Usage
 ---
 
 ### Browser Global
@@ -42,35 +43,20 @@ var indented = indent.indentJS(code, '  ');
 console.log(indented);
 ```
 
----
+*If you like this project please leave a star. Your support is greatly appreciated.*
 
-This project is great for code editors and file watchers. I'd love to hear about how your projects use indent.js.
+## Projects with indent.js:
 
-##Projects with indent.js:
+1. [Spck.io - An offline web editor that keeps your data private](https://spck.io/)
 
-1. [JsWriter - Web-base JavaScript IDE](https://jswriter.com/)
 
-Developers
----
+## Languages still not supported:
 
-ISupport for other languages would be nice, and greatly welcomed!
-Unfortunately, I do not know these languages well enough to construct rules for them.
+1. CoffeeScript
+2. Pug
 
-###Languages still not supported:
-
-1. TypeScript
-2. CoffeeScript
-3. Pug
-4. Less/Sass
-
-###Getting the project
+## Getting the project
 
 1. Run `npm install` to install dependencies
 2. Run `npm test` to run tests in `tests` folder
 3. Run `npm run build` to build the project
-
-## Contributing
-
-This project follows the [GitFlow branching model](http://nvie.com/posts/a-successful-git-branching-model). The ```master``` branch always reflects a production-ready state while the latest development is taking place in the ```develop``` branch.
-
-Each time you want to work on a fix or a new feature, create a new branch based on the ```develop``` branch: ```git checkout -b BRANCH_NAME develop```. Only pull requests to the ```develop``` branch will be merged.
