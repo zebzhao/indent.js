@@ -1,21 +1,138 @@
 var indent = (function() {
+    var rulesCache = {};
+
+    function filterRules(language) {
+        if (rulesCache[language])
+            return rulesCache[language];
+        var ret = [];
+        rulesCache[language] = ret;
+        for (var i=0; i<masterRules.length; i++) {
+            if (masterRules[i].langs.indexOf(language.toLowerCase()) != -1)
+                ret.push(masterRules[i]);
+        }
+        return ret;
+    }
+
     var NEW_LINE_REGEX = /\r*\n/;
-    var jsRules = [
+
+    /**
+     * indent - whether rule will cause indent
+     * ignore - ignore rule matching as long as is last active rule, e.g. string, comments
+     * advance - greedily consume endTokens when rule ends
+     * head - match at beginning of line only
+     * langs - used to filter by language later
+     * lineOffset - added to the line field when rule is applied
+     *
+     * Always keep NEW_LINE_REGEX endToken as last element,
+     * as otherwise it will be matched first, and subsequent ones may be ignored
+     * and skipped permanently by other rules.
+     */
+    var masterRules = [
         {
+            langs: "html",
+            name: "comment",
+            startToken: [/\<\!\-\-/],
+            endToken: [/\-\-\>/],
+            ignore: true,
+            advance: true
+        },
+        {
+            langs: "html",
+            name: "doctype",
+            startToken: [/\<\!/],
+            endToken: [NEW_LINE_REGEX],
+            ignore: true,
+            advance: true
+        },
+        {
+            langs: "html",
+            name: "link|br|hr|input|meta|img",
+            startToken: [/\<(link|br|hr|input|meta|img)/i],
+            endToken: [/>/],
+            advance: true
+        },
+        {
+            langs: "html",
+            name: "mode switch js",
+            startToken: [function (string, rule) {
+                var start = /<script[\s>].*/i;
+                var end = /<\/script>/i;
+                var startMatch = start.exec(string);
+                var endMatch = end.exec(string);
+
+                if (startMatch && (!endMatch || endMatch.index < startMatch.index)) {
+                    return {
+                        matchIndex: startMatch.index,
+                        length: startMatch[0].length
+                    };
+                }
+                return {matchIndex: -1};
+            }],
+            endToken: [/<\/script>/i],
+            rules: "js",
+            advance: true,
+            indent: true
+        },
+        {
+            langs: "html",
+            name: "mode switch css",
+            startToken: [function (string, rule) {
+                var start = /<style[\s>].*/i;
+                var end = /<\/style>/i;
+                var startMatch = start.exec(string);
+                var endMatch = end.exec(string);
+
+                if (startMatch && (!endMatch || endMatch.index < startMatch.index)) {
+                    return {
+                        matchIndex: startMatch.index,
+                        length: startMatch[0].length
+                    };
+                }
+                return {matchIndex: -1};
+            }],
+            endToken: [/<\/style>/i],
+            rules: "css",
+            advance: true,
+            indent: true
+        },
+        {
+            langs: "html",
+            name: "close-tag",
+            startToken: [/<\/[A-Za-z0-9\-]+>/],
+            endToken: [/./],
+            indent: true
+        },
+        {
+            langs: "html",
+            name: "tag attr",
+            startToken: [/<[A-Za-z0-9\-]+/],
+            endToken: [/>/],
+            indent: true
+        },
+        {
+            langs: "html",
+            name: "tag",
+            startToken: [/>/],
+            endToken: [/<\/[A-Za-z0-9\-]+>/],
+            indent: true,
+            advance: true
+        },
+        {
+            langs: "js",
             name: "line comment",
             startToken: [/\/\//],
             endToken: [NEW_LINE_REGEX],
-            ignore: true,
-            indent: false
+            ignore: true
         },
         {
+            langs: "js css",
             name: "block comment",
             startToken: [/\/\*/],
             endToken: [/\*\//],
-            ignore: true,
-            indent: false
+            ignore: true
         },
         {
+            langs: "js",
             name: "regex",
             startToken: [function (string, rule) {
                 var re = /[(,=:[!&|?{};][\s]*\/[^/]|^[\s]*\/[^/]/;
@@ -59,142 +176,133 @@ var indent = (function() {
                 };
             }],
             ignore: true,
-            indent: false,
             advance: true
         },
         {
+            langs: "js css html",
             name: "string",
             startToken: [/\"/],
             endToken: [/\"/, NEW_LINE_REGEX],
             ignore: true,
-            indent: false,
             advance: true
         },
         {
+            langs: "js css html",
             name: "string",
             startToken: [/\'/],
             endToken: [/\'/, NEW_LINE_REGEX],
             ignore: true,
-            indent: false,
             advance: true
         },
         {
+            langs: "js css html",
             name: "string",
             startToken: [/\`/],
             endToken: [/\`/],
             ignore: true,
-            indent: false,
             advance: true
         },
         {
+            langs: "js",
             name: "if",
             startToken: [/^if[\s]*(?=\()/, /[\s]+if[\s]*(?=\()/],
-            endToken: [/else[\s]+/, /\{/, /\;/],
+            endToken: [/else[\s]+/, /\{/, /;/],
             indent: true
         },
         {
+            langs: "js",
             name: "for",
             startToken: [/^for[\s]*(?=\()/],
-            endToken: [/\{/, /\;/],
+            endToken: [/\{/, /;/],
             indent: true
         },
         {
+            langs: "js",
             name: "else",
             startToken: [/else[\s]+/],
-            endToken: [/if/, /\{/, /\;/, NEW_LINE_REGEX],
+            endToken: [/if/, /\{/, /;/, NEW_LINE_REGEX],
             indent: true
         },
         {
+            langs: "js css",
             name: "bracket",
-            startToken: [/\(/],
+            startToken: [/\([\s]*(var)?/],
             endToken: [/\)/],
             indent: true,
             advance: true
         },
         {
-            name: "array",
-            startToken: [/\[/],
-            endToken: [/\]/],
+            langs: "js",
+            name: "dot chain",
+            startToken: [/^\../],
+            endToken: [/;/, NEW_LINE_REGEX],
             indent: true,
-            advance: true
+            head: true,
+            lineOffset: -1
         },
         {
-            name: "block",
-            startToken: [/\{/],
-            endToken: [/\}/],
-            indent: true,
-            advance: true
-        },
-        {
-            name: "var",
-            startToken: [/var[\s]+/],
-            endToken: [/\;/],
+            langs: "js",
+            name: "dot chain",
+            startToken: [/\.\s*$/],
+            endToken: [function (string, rule) {
+                return {
+                    matchIndex: string.length ? 1 : -1,
+                    length: string.length ? 0 : 1
+                };
+            }],
             indent: true
         },
         {
+            langs: "js css",
+            name: "array",
+            startToken: [/\[/],
+            endToken: [/]/],
+            indent: true,
+            advance: true
+        },
+        {
+            langs: "js css",
+            name: "block",
+            startToken: [/\{/],
+            endToken: [/}/],
+            indent: true,
+            advance: true
+        },
+        {
+            langs: "js",
+            name: "var",
+            startToken: [/var[\s]+/],
+            endToken: [/;/],
+            indent: true
+        },
+        {
+            langs: "js",
             name: "case",
             startToken: [/^case[\s]+/],
-            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /\}/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /}/],
             indent: true
         }
     ];
 
-    var htmlRules = [
-        {
-            name: "comment",
-            startToken: [/\<\!\-\-/],
-            endToken: [/\-\-\>/],
-            ignore: true,
-            indent: false,
-            advance: true
-        },
-        {
-            name: "doctype",
-            startToken: [/\<\!/],
-            endToken: [NEW_LINE_REGEX],
-            ignore: true,
-            indent: false,
-            advance: true
-        },
-        {
-            name: "link|br|input|meta",
-            startToken: [/\<(link|br|input|meta)/i],
-            endToken: [/(\"[^\"]*\"|'[^']*'|[^'\">])*>/],
-            ignore: true,
-            indent: false,
-            advance: true
-        },
-        {
-            name: "tag",
-            startToken: [/<(\"[^\"]*\"|'[^']*'|[^'\">])*>/],
-            endToken: [/\<\/[^\>]+\>/],
-            indent: true,
-            advance: true
-        },
-        {
-            name: "tag",
-            startToken: [/<(\"[^\"]*\"|'[^']*'|[^'\">])*/],
-            endToken: [/\/\>/],
-            indent: false,
-            advance: true
-        }
-    ].concat(jsRules);
-
     return {
-        indentCSS: indentJS,
+        indentCSS: indentCSS,
         indentJS: indentJS,
         indentHTML: indentHTML
     };
 
     function indentJS(code, indentString) {
-        return indent(code, jsRules, indentString);
+        return indent(code, filterRules('js'), indentString);
+    }
+
+    function indentCSS(code, indentString) {
+        return indent(code, filterRules('css'), indentString);
     }
 
     function indentHTML(code, indentString) {
-        return indent(code, htmlRules, indentString);
+        return indent(code, filterRules('html'), indentString);
     }
 
-    function indent(code, rules, indentation) {
+    function indent(code, baseRules, indentation) {
         var lines = code.split(/[\r]?\n/gi);
         var lineCount = lines.length;
         var newLines = [];
@@ -205,12 +313,13 @@ var indent = (function() {
         var l = 0;
         var pos = 0;
         var matchEnd, matchStart;
+        var modeRules = null;
 
         while (l < lineCount) {
             var line = lines[l].trim();
             var lineToMatch = cleanEscapedChars(line) + '\r\n';
 
-            matchStart = matchStartRule(lineToMatch, rules, pos);
+            matchStart = matchStartRule(lineToMatch, modeRules || baseRules, pos);
 
             if (activeRules.length) {
                 matchEnd = matchEndRule(lineToMatch, lastRule, pos);
@@ -222,14 +331,8 @@ var indent = (function() {
                     }
                 }
                 else if (lastRule.ignore || matchStart.matchIndex == -1 || matchEnd.matchIndex <= matchStart.matchIndex) {
-                    if (lastRule.indent) {
-                        consumeIndentation();
-                        if (matchEnd.matchIndex == 0) {
-                            calculateIndents();
-                        }
-                    }
-                    pos = matchEnd.cursor;
                     removeLastRule();
+                    pos = matchEnd.cursor;
                     continue;  // Repeat process for matching line start/end
                 }
             }
@@ -249,11 +352,24 @@ var indent = (function() {
             pos = match.cursor;
             lastRule = match.rule;
             activeRules.push(lastRule);
-            if (lastRule.indent)
-                incrementIndentation();
+            if (lastRule.indent) {
+                incrementIndentation(lastRule.lineOffset);
+            }
+            if (lastRule.rules) {
+                modeRules = filterRules(lastRule.rules);
+            }
         }
 
         function removeLastRule() {
+            if (lastRule.indent) {
+                consumeIndentation();
+                if (matchEnd.matchIndex == 0) {
+                    calculateIndents();
+                }
+            }
+            if (lastRule.rules) {
+                modeRules = null;
+            }
             activeRules.pop();
             lastRule = activeRules[activeRules.length - 1];
         }
@@ -274,7 +390,7 @@ var indent = (function() {
             calculateIndents();
         }
 
-        function incrementIndentation() {
+        function incrementIndentation(lineOffset) {
             var matched = indentBuffer[indentBuffer.length - 1];
             if (matched && matched.line == l) {
                 matched.indent++;
@@ -283,8 +399,9 @@ var indent = (function() {
                 indentBuffer.push({
                     indent: 1,
                     open: true,
-                    line: l
+                    line: lineOffset ? l + lineOffset : l
                 });
+                if (lineOffset < 0) calculateIndents();
             }
         }
 
@@ -316,7 +433,8 @@ var indent = (function() {
         for (var rule, r = 0; r < rules.length; r++) {
             rule = rules[r];
             match = searchAny(string, rule.startToken, rule);
-            if (match.matchIndex != -1 && match.matchIndex < minIndex) {
+            if (match.matchIndex != -1 && match.matchIndex < minIndex
+                && (!rule.head || index == 0)) {
                 minIndex = match.matchIndex;
                 minMatch = match;
                 result = rule;
