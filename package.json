@@ -1,6 +1,6 @@
 {
   "name": "indent.js",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "Fast minimalistic pure indentation of JavaScript, CSS, and HTML.",
   "main": "lib/indent.js",
   "directories": {

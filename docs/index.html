@@ -50,6 +50,7 @@
                     <label>Indent with</label>
                     <select id="indentWithSelect">
                         <option value="\t" selected="selected">Tab</option>
+                        <option value="">0 Spaces</option>
                         <option value=" ">1 Space</option>
                         <option value="  ">2 Spaces</option>
                         <option value="   ">3 Spaces</option>
@@ -63,7 +64,7 @@
                     </select>
                 </td>
                 <td>
-                    <button style="width:100%;height:35px" onclick="reformatCode()">Reindent Code</button>
+                    <button style="width:100%;min-height:35px" onclick="reformatCode()">Reindent Code</button>
                 </td>
             </tr>
         </table>

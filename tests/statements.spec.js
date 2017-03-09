@@ -143,4 +143,54 @@ for(var i=0)
         });
         expect(indent.indentJS(input, '  ')).toEqual(expected);
     });
+
+    it('should handle terminate bracket on same line', function() {
+        var input =  hereDoc(function() {/*!
+if (test) {
+cool();}
+else if (test) {
+cool();}
+*/
+        });
+        var expected = hereDoc(function() {/*!
+if (test) {
+  cool();}
+else if (test) {
+  cool();}
+*/
+        });
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
+    
+    it('should handle single line for loop', function() {
+        var input =  hereDoc(function() {/*!
+for (var key in obj) keys.push(key);
+keys.sort();
+*/
+        });
+        var expected = hereDoc(function() {/*!
+for (var key in obj) keys.push(key);
+keys.sort();
+*/
+        });
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
+
+    it('should handle conditionals', function() {
+        var input =  hereDoc(function() {/*!
+forEach(parts, function(value){
+  text += fn ? fn(date, $locale.DATETIME_FORMATS)
+  : value.replace(/(^'|'$)/g, '').replace(/''/g, "'");
+});
+*/
+        });
+        var expected = hereDoc(function() {/*!
+forEach(parts, function(value){
+  text += fn ? fn(date, $locale.DATETIME_FORMATS)
+  : value.replace(/(^'|'$)/g, '').replace(/''/g, "'");
+});
+*/
+        });
+        expect(indent.indentJS(input, '  ')).toEqual(expected);
+    });
 });
