@@ -46,8 +46,8 @@ var indent = (function() {
         },
         {
             langs: "html",
-            name: "link|br|input|meta",
-            startToken: [/\<(link|br|input|meta)/i],
+            name: "link|br|hr|input|img|meta",
+            startToken: [/\<(link|br|hr|input|img|meta)/i],
             endToken: [/>/],
             advance: true
         },
