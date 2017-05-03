@@ -13,6 +13,11 @@ generateExtendPrototypeTests();
 break;
 case 10:
 return null;
+case 11:
+return;
+default:
+baz=null;
+return;
 default:
 baz=null;
 }
@@ -31,6 +36,11 @@ switch (process.env.TEST_SUITE) {
     break;
   case 10:
     return null;
+  case 11:
+    return;
+  default:
+    baz=null;
+    return;
   default:
     baz=null;
 }

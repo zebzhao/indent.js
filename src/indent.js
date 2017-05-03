@@ -280,7 +280,7 @@ var indent = (function() {
             langs: "js",
             name: "case",
             startToken: [/^case[\s]+/],
-            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return[\s]+/, /}/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
             endTokenIndent: true,
             indent: true
         },
@@ -288,7 +288,7 @@ var indent = (function() {
             langs: "js",
             name: "default",
             startToken: [/^default[\s]*:/],
-            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return[\s]+/, /}/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
             endTokenIndent: true,
             indent: true
         }
