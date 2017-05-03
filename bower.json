@@ -1,10 +1,11 @@
 {
   "name": "indent.js",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "https://github.com/zebzhao/indent.js",
   "main": "lib/indent.js",
   "dependencies": {},
   "ignore": [
+    "coverage",
     "node_modules",
     "gulpfile.js",
     "karma.conf.js",
