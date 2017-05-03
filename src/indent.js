@@ -17,8 +17,9 @@ var indent = (function() {
 
     /**
      * indent - whether rule will cause indent
-     * ignore - ignore rule matching as long as is last active rule, e.g. string, comments
-     * advance - greedily consume endTokens when rule ends
+     * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
+     * advance - advance the cursor to the end of the endTokens
+     * endTokenIndent - keep the indent rule active for the endTokens
      * head - match at beginning of line only
      * langs - used to filter by language later
      * lineOffset - added to the line field when rule is applied
@@ -279,7 +280,16 @@ var indent = (function() {
             langs: "js",
             name: "case",
             startToken: [/^case[\s]+/],
-            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /}/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return[\s]+/, /}/],
+            endTokenIndent: true,
+            indent: true
+        },
+        {
+            langs: "js",
+            name: "default",
+            startToken: [/^default[\s]*:/],
+            endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return[\s]+/, /}/],
+            endTokenIndent: true,
             indent: true
         }
     ];
@@ -363,7 +373,7 @@ var indent = (function() {
         function removeLastRule() {
             if (lastRule.indent) {
                 consumeIndentation();
-                if (matchEnd.matchIndex == 0) {
+                if (!lastRule.endTokenIndent && matchEnd.matchIndex == 0) {
                     calculateIndents();
                 }
             }
