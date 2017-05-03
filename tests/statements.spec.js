@@ -11,6 +11,10 @@ console.log('suite: old-jquery-and-extend-prototypes');
 generateOldJQueryTests();
 generateExtendPrototypeTests();
 break;
+case 10:
+return null;
+default:
+baz=null;
 }
 */
         });
@@ -19,12 +23,16 @@ switch (process.env.TEST_SUITE) {
   case 'built-tests':
     console.log('suite: built-tests');
     generateBuiltTests();
-  break;
+    break;
   case 'old-jquery-and-extend-prototypes':
     console.log('suite: old-jquery-and-extend-prototypes');
     generateOldJQueryTests();
     generateExtendPrototypeTests();
-  break;
+    break;
+  case 10:
+    return null;
+  default:
+    baz=null;
 }
 */
         });
