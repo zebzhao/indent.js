@@ -17,7 +17,8 @@ gulp.task('build-minify', function (cb) {
                 return 'indent';
             }
         }))
-        .pipe(gulp.dest('./lib'));
+        .pipe(gulp.dest('./lib'))
+        .pipe(gulp.dest('./docs/js'));
 });
 
 gulp.task('build-debug', function (cb) {

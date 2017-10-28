@@ -513,7 +513,7 @@ body {
   font-weight: 300;
   margin: 0px;
   padding: 0px 0 20px 0px;
-  background: url(../images/body-background.png) #eae6d1;
+  background: url(../img/body-background.png) #eae6d1;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -561,7 +561,7 @@ a small {
 }
 
 ul {
-  list-style-image: url("../images/bullet.png");
+  list-style-image: url("../img/bullet.png");
 }
 
 strong {
@@ -646,7 +646,7 @@ hr {
   border: 0;
   outline: none;
   height: 11px;
-  background: transparent url("../images/hr.gif") center center repeat-x;
+  background: transparent url("../img/hr.gif") center center repeat-x;
   margin: 0 0 20px;
 }
 
@@ -664,7 +664,7 @@ header {
   right: 0;
   width: 100%;
   text-align: center;
-  background: url(../images/background.png) #4276b6;
+  background: url(../img/background.png) #4276b6;
   -moz-box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.75);
   -webkit-box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.75);
   -o-box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.75);
@@ -780,7 +780,7 @@ header p {
   right: 7px;
   top: 7px;
   display: block;
-  background: url(../images/octocat-logo.png);
+  background: url(../img/octocat-logo.png);
 }
 
 section {
