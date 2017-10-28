@@ -294,7 +294,7 @@ var indent = (function() {
         }
     ];
 
-    return {
+    var exports = {
         css: function (code, indentString) {
             return indent(code || '', filterRules('css'), indentString || '\t');
         },
@@ -303,8 +303,32 @@ var indent = (function() {
         },
         html: function (code, indentString) {
             return indent(code || '', filterRules('html'), indentString || '\t');
+        },
+        /**
+         * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use js instead.
+         */
+        indentJS: function(code, indentString) {
+            if (console && console.warn) console.warn("Calling deprecated function!");
+            return exports.js(code, indentString);
+        },
+        /**
+         * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use css instead.
+         */
+        indentCSS: function(code, indentString) {
+            if (console && console.warn) console.warn("Calling deprecated function!");
+            return exports.css(code, indentString);
+        },
+        /**
+         * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use html instead.
+         */
+        indentHTML: function(code, indentString) {
+            if (console && console.warn) console.warn("Calling deprecated function!");
+            return exports.html(code, indentString);
         }
     };
+
+    return exports;
+
 
     function indent(code, baseRules, indentation) {
         var lines = code.split(/[\r]?\n/gi);
