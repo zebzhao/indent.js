@@ -23,14 +23,14 @@ Usage
 
 ### Browser Global
 ```javascript
-var indented = indent.indentJS(code, '\t');
+var indented = indent.js(code, '\t');
 console.log(indented);
 ```
 
 ### Browser using AMD
 ```javascript
 define(['indent'] , function (indent) {
-    var indented = indent.indentJS(code, '\t');
+    var indented = indent.js(code, '\t');
     console.log(indented);
 });
 ```
@@ -38,7 +38,12 @@ define(['indent'] , function (indent) {
 ### Node
 ```javascript
 var indent = require('indent');
-var indented = indent.indentJS(code, '  ');
+// JS code
+var indented = indent.js(js, '  ');
+// CSS code
+var indented = indent.css(css, '  ');
+// HTML code
+var indented = indent.html(html, '  ');
 console.log(indented);
 ```
 
@@ -46,22 +51,16 @@ console.log(indented);
 
 This project is great for code editors and file watchers. I'd love to hear about how your projects use indent.js.
 
-##Projects with indent.js:
-
-1. [JsWriter - Web-base JavaScript IDE](https://jswriter.com/)
-
 Developers
 ---
 
-ISupport for other languages would be nice, and greatly welcomed!
-Unfortunately, I do not know these languages well enough to construct rules for them.
+The rules this library uses are very simple and work on most languages with syntax using (), {}, etc...
+The languages below have not been fully tested and may fail to indent properly for some special cases.
 
-###Languages still not supported:
+###Languages still not fully supported:
 
-1. TypeScript
-2. CoffeeScript
-3. Pug
-4. Less/Sass
+1. TypeScript (partial?)
+2. Less/Sass (partial?)
 
 ###Getting the project
 
@@ -71,6 +70,7 @@ Unfortunately, I do not know these languages well enough to construct rules for 
 
 ## Contributing
 
-This project follows the [GitFlow branching model](http://nvie.com/posts/a-successful-git-branching-model). The ```master``` branch always reflects a production-ready state while the latest development is taking place in the ```develop``` branch.
+This project follows the [GitFlow branching model](http://nvie.com/posts/a-successful-git-branching-model).
+The ```master``` branch always reflects a production-ready state while the latest development is taking place in the ```develop``` branch.
 
 Each time you want to work on a fix or a new feature, create a new branch based on the ```develop``` branch: ```git checkout -b BRANCH_NAME develop```. Only pull requests to the ```develop``` branch will be merged.
