@@ -3,12 +3,11 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var umd = require('gulp-umd');
 
-gulp.task('build', ['build-minify', 'build-debug']);
+gulp.task('build', ['build-minify', 'build-debug', 'build-docs']);
 
 gulp.task('build-minify', function (cb) {
     return gulp.src(['src/**/*.js'])
         .pipe(concat('indent.min.js'))
-        .pipe(uglify())
         .pipe(umd({
             exports: function(file) {
                 return 'indent';
@@ -17,8 +16,13 @@ gulp.task('build-minify', function (cb) {
                 return 'indent';
             }
         }))
+        .pipe(uglify())
         .pipe(gulp.dest('./lib'))
-        .pipe(gulp.dest('./docs/js'));
+});
+
+gulp.task('build-docs', function (cb) {
+  return gulp.src(['src/**/*.js'])
+    .pipe(gulp.dest('./docs/js'))
 });
 
 gulp.task('build-debug', function (cb) {
