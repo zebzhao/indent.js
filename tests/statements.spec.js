@@ -146,7 +146,7 @@ if (test)
 test
 test
 if (test)
-if (is) {var t=0}
+if (is) {var t=0;}
 else var s=0;
 for(var i=0)
 execute();
@@ -159,8 +159,8 @@ if (test)
   test
 test
 if (test)
-  if (is) {var t=0}
-  else var s=0;
+  if (is) {var t=0;}
+else var s=0;
 for(var i=0)
   execute();
 */
