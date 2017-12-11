@@ -275,15 +275,15 @@ var indent = (function() {
         },
         {
             langs: "js",
-            name: "var",
-            startToken: [/var[\s]*$/],
+            name: "var/let/const",
+            startToken: [/(var|let|const)[\s]*$/],
             endToken: [/;/],
             indent: true
         },
         {
             langs: "js",
-            name: "var,",
-            startToken: [/var[\s]+.+,[\s]*$/],
+            name: "var,/let,/const,",
+            startToken: [/(var|let|const)[\s]+.+,[\s]*$/],
             endToken: [/;/],
             indent: true
         },
