@@ -276,7 +276,14 @@ var indent = (function() {
         {
             langs: "js",
             name: "var",
-            startToken: [/var[\s]+/],
+            startToken: [/var[\s]*$/],
+            endToken: [/;/],
+            indent: true
+        },
+        {
+            langs: "js",
+            name: "var,",
+            startToken: [/var[\s]+.+,[\s]*$/],
             endToken: [/;/],
             indent: true
         },
