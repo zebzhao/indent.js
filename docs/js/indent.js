@@ -279,8 +279,8 @@ var indent = (function () {
     {
       langs: "js",
       name: "var/let/const",
-      starts: [/(var|let|const)[\s]*$/],
-      ends: [/./],
+      starts: [/(var|let|const)[\s]*\r*\n$/],
+      ends: [/[\w$]/],
       indent: true,
       endsIndent: true
     },
