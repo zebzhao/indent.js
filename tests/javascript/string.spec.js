@@ -1,4 +1,5 @@
 var sut = require('../../lib/indent').js;
+var expect = require('chai').expect;
 var ts = '  ';
 
 describe('', function () {
