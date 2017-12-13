@@ -278,9 +278,10 @@ var indent = (function () {
     {
       langs: "js",
       name: "var/let/const",
-      startToken: [/(var|let|const)[\s]*\r*\n/],
+      startToken: [/(var|let|const)[\s]*$/],
       endToken: [/./],
-      indent: true
+      indent: true,
+      endTokenIndent: true
     },
     {
       langs: "js",
@@ -292,8 +293,18 @@ var indent = (function () {
       langs: "js",
       name: "var/let/const",
       lastRule: "var/let/const",
-      startToken: [/^,/, /^,[\s]*\r*\n]/],
+      startToken: [/,[\s]*\r*\n$/],
       endToken: [/./],
+      endTokenIndent: true,
+      indent: true
+    },
+    {
+      langs: "js",
+      name: "var/let/const",
+      lastRule: "var/let/const",
+      startToken: [/^,/],
+      endToken: [/./],
+      head: true,
       indent: true,
       lineOffset: -1
     },
@@ -430,6 +441,9 @@ var indent = (function () {
       if (currentRule.rules) {
         modeRules = filterRules(currentRule.rules);
       }
+      if (currentRule.debug) {
+        debugger;
+      }
     }
 
     function removeCurrentRule() {
@@ -498,7 +512,9 @@ var indent = (function () {
       var match;
       for (var rule, r = 0; r < rules.length; r++) {
         rule = rules[r];
-        if (!rule.lastRule || lastInactiveRule.name === rule.lastRule) {
+        if (!rule.lastRule ||
+            (lastInactiveRule && lastInactiveRule.name === rule.lastRule)
+        ) {
           match = searchAny(string, rule.startToken, rule);
           if (match.matchIndex != -1 && match.matchIndex < minIndex
             && (!rule.head || index == 0)) {

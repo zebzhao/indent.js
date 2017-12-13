@@ -10,11 +10,12 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "chai": "^4.1.2",
     "gulp": "^3.9",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^1.4.1",
     "gulp-umd": "^0.2.0",
-    "jasmine": "^2.8.0"
+    "mocha": "^4.0.1"
   },
   "scripts": {
     "build": "gulp build"

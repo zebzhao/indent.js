@@ -1,12 +1,15 @@
 var sut = require('../../lib/indent').js;
+var expect = require('chai').expect;
 var ts = '  ';
 
-describe('', function () {
-  it('', function () {
+describe('var', function () {
+  it('all', function () {
     var expected = `
 var a,
   b=c,
-  c
+  c,d
+
+  ,e
 
 let a
   ,b
@@ -26,7 +29,8 @@ let a = {
     b: c,
     d: e,
   },
-  f=1;
+  
+  f=1, g, h;
   
 const a = function () {
     statement;
@@ -37,6 +41,7 @@ const a = function () {
   c = 10;
 
 `;
-    expect(expected).toBe(sut(expected, ts));
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
   });
 });
