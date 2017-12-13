@@ -18,13 +18,14 @@ a.test
     
   extend(function () {
     // invalid
-    var f.
+    f.
       
       g.h.
       
       i;
     
-    .test
+    .j.
+      k;
   });
 
 .0

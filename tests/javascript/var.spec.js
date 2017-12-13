@@ -17,8 +17,14 @@ let a
     ,1]
 
 const
+  
   a, b=[1
     ,2]
+    
+let
+  a, b={
+    c: d,
+  }
 
 var a = {
   b: c,
