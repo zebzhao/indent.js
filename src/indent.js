@@ -19,8 +19,8 @@ var indent = (function () {
   /**
    * indent - whether rule will cause indent
    * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
-   * advance - advance the cursor to the end of the endss
-   * endsIndent - keep the indent rule active for the endss
+   * advance - advance the cursor to the end of the ends
+   * endsIndent - keep the indent rule active for the ends
    * head - match at beginning of line only
    * langs - used to filter by language later
    * lineOffset - added to the line field when rule is applied
@@ -378,14 +378,12 @@ var indent = (function () {
   function indent(code, baseRules, indentation) {
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
-    var newLines = [];
-    var indentBuffer = [];
+    var indentDeltas = [];
     var activeRules = [];
     var lastRules= [null];
     var activeCountdowns = [];
     var currentRule;
     var currentCountdown;
-    var indents = 0;
     var l = 0;
     var pos = 0;
     var matchEnd, matchStart;
@@ -430,7 +428,19 @@ var indent = (function () {
       }
     }
 
+    var
+      indents = 0,
+      newLines = [];
+
+    for (var i=0; i<lines.length; i++) {
+      indents += indentDeltas[i] || 0;
+      newLines.push((indents > 0 ? repeatString(indentation, indents) : '') + lines[i].trim());
+    }
+
+    console.log(indentDeltas);
+
     return newLines.join('\r\n');
+
 
     function implementRule(match) {
       pos = match.cursor;
@@ -439,7 +449,7 @@ var indent = (function () {
       activeRules.push(currentRule);
       activeCountdowns.push(currentRule.countdown);
       if (currentRule.indent) {
-        incrementIndentation(currentRule.lineOffset);
+        incrementIndentation((l + 1) + (currentRule.lineOffset || 0));
       }
       if (currentRule.rules) {
         modeRules = filterRules(currentRule.rules);
@@ -454,10 +464,8 @@ var indent = (function () {
 
     function removeCurrentRule() {
       if (currentRule.indent) {
-        consumeIndentation();
-        if (!currentRule.endsIndent && matchEnd.matchIndex == 0) {
-          calculateIndents();
-        }
+        var offset = currentRule.endsIndent || matchEnd.matchIndex != 0 ? 1 : 0;
+        consumeIndentation(l + offset);
       }
       if (currentRule.rules) {
         modeRules = null;
@@ -472,45 +480,19 @@ var indent = (function () {
       currentCountdown = activeCountdowns[activeCountdowns.length - 1];
     }
 
-    function calculateIndents() {
-      indents = 0;
-      for (var b, i = 0; i < indentBuffer.length; i++) {
-        b = indentBuffer[i];
-        if (b.open && b.line != l)
-          indents++;
-      }
-    }
-
     function incrementLine() {
-      newLines[l] = repeatString(indentation, indents) + line;
       l++;
       pos = 0;
-      calculateIndents();
     }
 
-    function incrementIndentation(lineOffset) {
-      var matched = indentBuffer[indentBuffer.length - 1];
-      if (matched && matched.line == l) {
-        matched.indent++;
-      }
-      else {
-        indentBuffer.push({
-          indent: 1,
-          open: true,
-          line: lineOffset ? l + lineOffset : l
-        });
-        if (lineOffset < 0) calculateIndents();
-      }
+    function incrementIndentation(line) {
+      indentDeltas[line] = indentDeltas[line] || 0;
+      indentDeltas[line]++;
     }
 
-    function consumeIndentation() {
-      var lastElem = indentBuffer[indentBuffer.length - 1];
-      if (lastElem) {
-        lastElem.open = l == lastElem.line;
-        if (--lastElem.indent <= 0) {
-          indentBuffer.pop();
-        }
-      }
+    function consumeIndentation(line) {
+      indentDeltas[line] = indentDeltas[line] || 0;
+      indentDeltas[line]--;
     }
 
     function matchStartRule(string, rules, index) {
