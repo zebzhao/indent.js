@@ -2,8 +2,8 @@ var sut = require('../../lib/indent').js;
 var expect = require('chai').expect;
 var ts = '  ';
 
-describe('', function () {
-  it('', function () {
+describe('string', function () {
+  it('all', function () {
     var expected = `
 "\""
 

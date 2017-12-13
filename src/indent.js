@@ -19,15 +19,16 @@ var indent = (function () {
   /**
    * indent - whether rule will cause indent
    * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
-   * advance - advance the cursor to the end of the endTokens
-   * endTokenIndent - keep the indent rule active for the endTokens
+   * advance - advance the cursor to the end of the endss
+   * endsIndent - keep the indent rule active for the endss
    * head - match at beginning of line only
    * langs - used to filter by language later
    * lineOffset - added to the line field when rule is applied
    * lastRule - used to continue a previous rule
    * countdown - terminate rule after this number of lines
+   * scope - used to determine if rule creates a new scope, used for lastRule
    *
-   * Always keep NEW_LINE_REGEX endToken as last element,
+   * Always keep NEW_LINE_REGEX ends as last element,
    * as otherwise it will be matched first, and subsequent ones may be ignored
    * and skipped permanently by other rules.
    */
@@ -35,30 +36,30 @@ var indent = (function () {
     {
       langs: "html",
       name: "comment",
-      startToken: [/\<\!\-\-/],
-      endToken: [/\-\-\>/],
+      starts: [/\<\!\-\-/],
+      ends: [/\-\-\>/],
       ignore: true,
       advance: true
     },
     {
       langs: "html",
       name: "doctype",
-      startToken: [/\<\!doctype html>/i],
-      endToken: [NEW_LINE_REGEX],
+      starts: [/\<\!doctype html>/i],
+      ends: [NEW_LINE_REGEX],
       ignore: true,
       advance: true
     },
     {
       langs: "html",
       name: "link|br|hr|input|img|meta",
-      startToken: [/\<(link|br|hr|input|img|meta)/i],
-      endToken: [/>/],
+      starts: [/\<(link|br|hr|input|img|meta)/i],
+      ends: [/>/],
       advance: true
     },
     {
       langs: "html",
       name: "mode switch js",
-      startToken: [function (string) {
+      starts: [function (string) {
         var start = /<script[\s>].*/i;
         var end = /<\/script>/i;
         var startMatch = start.exec(string);
@@ -72,15 +73,16 @@ var indent = (function () {
         }
         return {matchIndex: -1};
       }],
-      endToken: [/<\/script>/i],
+      ends: [/<\/script>/i],
       rules: "js",
       advance: true,
-      indent: true
+      indent: true,
+      scope: true
     },
     {
       langs: "html",
       name: "mode switch css",
-      startToken: [function (string) {
+      starts: [function (string) {
         var start = /<style[\s>].*/i;
         var end = /<\/style>/i;
         var startMatch = start.exec(string);
@@ -94,57 +96,58 @@ var indent = (function () {
         }
         return {matchIndex: -1};
       }],
-      endToken: [/<\/style>/i],
+      ends: [/<\/style>/i],
       rules: "css",
       advance: true,
-      indent: true
+      indent: true,
+      scope: true
     },
     {
       langs: "html",
       name: "close-tag",
-      startToken: [/<\/[A-Za-z0-9\-]+>/],
-      endToken: [/./],
+      starts: [/<\/[A-Za-z0-9\-]+>/],
+      ends: [/./],
       indent: true
     },
     {
       langs: "html",
-      name: "tag attr",
-      startToken: [/<[A-Za-z0-9\-]+/],
-      endToken: [/>/],
+      name: "tag-attr",
+      starts: [/<[A-Za-z0-9\-]+/],
+      ends: [/>/],
       indent: true
     },
     {
       langs: "html",
       name: "tag",
-      startToken: [/>/],
-      endToken: [/<\/[A-Za-z0-9\-]+>/],
+      starts: [/>/],
+      ends: [/<\/[A-Za-z0-9\-]+>/],
       indent: true,
       advance: true
     },
     {
       langs: "js",
-      name: "line comment",
-      startToken: [/\/\//],
-      endToken: [NEW_LINE_REGEX],
+      name: "line-comment",
+      starts: [/\/\//],
+      ends: [NEW_LINE_REGEX],
       ignore: true
     },
     {
       langs: "js css",
-      name: "block comment",
-      startToken: [/\/\*/],
-      endToken: [/\*\//],
+      name: "block-comment",
+      starts: [/\/\*/],
+      ends: [/\*\//],
       ignore: true
     },
     {
       langs: "js",
       name: "regex",
-      startToken: [function (string, rule) {
+      starts: [function (string, rule) {
         var re = /[(,=:[!&|?{};][\s]*\/[^/]|^[\s]*\/[^/]/;
         var startIndex = string.search(re);
         if (startIndex != -1) {
           startIndex = string.indexOf('/', startIndex);
           var substr = string.substring(startIndex + 1);
-          var match = searchAny(substr, rule.endToken, rule);
+          var match = searchAny(substr, rule.ends, rule);
           if (match.matchIndex != -1) {
             substr = substr.substring(0, match.matchIndex);
             try {
@@ -161,7 +164,7 @@ var indent = (function () {
         }
         return {matchIndex: -1};
       }],
-      endToken: [function (string) {
+      ends: [function (string) {
         var fromIndex = 0;
         var index = string.indexOf('/');
         while (index != -1) {
@@ -185,64 +188,65 @@ var indent = (function () {
     {
       langs: "js css html",
       name: "string",
-      startToken: [/\"/],
-      endToken: [/\"/, NEW_LINE_REGEX],
+      starts: [/\"/],
+      ends: [/\"/, NEW_LINE_REGEX],
       ignore: true,
       advance: true
     },
     {
       langs: "js css html",
       name: "string",
-      startToken: [/\'[^']/],
-      endToken: [/[^\\]\'/, NEW_LINE_REGEX],
+      starts: [/\'[^']/],
+      ends: [/[^\\]\'/, NEW_LINE_REGEX],
       ignore: true,
       advance: true
     },
     {
       langs: "js css html",
       name: "string",
-      startToken: [/\`[^`]/],
-      endToken: [/[^\\]\`/],
+      starts: [/\`[^`]/],
+      ends: [/[^\\]\`/],
       ignore: true,
       advance: true
     },
     {
       langs: "js",
       name: "if",
-      startToken: [/^if[\s]*(?=\()/, /[\s]+if[\s]*(?=\()/],
-      endToken: [/else[\s]+/, /\{/, SEMICOLON],
+      starts: [/^if[\s]*(?=\()/, /[\s]+if[\s]*(?=\()/],
+      ends: [/else[\s]+/, /\{/, SEMICOLON],
       countdown: 2,
       indent: true
     },
     {
       langs: "js",
       name: "for",
-      startToken: [/^for[\s]*(?=\()/],
-      endToken: [/\{/, SEMICOLON],
+      starts: [/^for[\s]*(?=\()/],
+      ends: [/\{/, SEMICOLON],
       countdown: 2,
       indent: true
     },
     {
       langs: "js",
       name: "else",
-      startToken: [/else[\s]+/],
-      endToken: [/if/, /\{/, SEMICOLON],
+      starts: [/else[\s]+/],
+      ends: [/if/, /\{/, SEMICOLON],
       countdown: 2,
       indent: true
     },
     {
       langs: "js css",
       name: "bracket",
-      startToken: [/\([\s]*(var)?/],
-      endToken: [/\)/],
+      starts: [/\([\s]*(var)?/],
+      ends: [/\)/],
       indent: true,
-      advance: true
+      advance: true,
+      scope: true
     },
     {
       langs: "js",
       name: "dot-chain",
-      startToken: [/^\../],
-      endToken: [SEMICOLON, NEW_LINE_REGEX],
+      starts: [/^\.[A-Za-z$_]/],
+      ends: [NEW_LINE_REGEX],
       indent: true,
       head: true,
       lineOffset: -1
@@ -250,60 +254,57 @@ var indent = (function () {
     {
       langs: "js",
       name: "dot-chain",
-      startToken: [/\.\s*$/],
-      endToken: [function (string) {
-        return {
-          matchIndex: string.length ? 1 : -1,
-          length: string.length ? 0 : 1
-        };
-      }],
+      starts: [/\.\s*$/],
+      ends: [/[\w$]/],
       indent: true
     },
     {
       langs: "js css",
       name: "array",
-      startToken: [/\[/],
-      endToken: [/]/],
+      starts: [/\[/],
+      ends: [/]/],
       indent: true,
-      advance: true
+      advance: true,
+      scope: true
     },
     {
       langs: "js css",
       name: "block",
-      startToken: [/\{/],
-      endToken: [/}/],
+      starts: [/\{/],
+      ends: [/}/],
       indent: true,
-      advance: true
+      advance: true,
+      scope: true
     },
     {
       langs: "js",
       name: "var/let/const",
-      startToken: [/(var|let|const)[\s]*$/],
-      endToken: [/./],
+      starts: [/(var|let|const)[\s]*$/],
+      ends: [/./],
       indent: true,
-      endTokenIndent: true
+      endsIndent: true
     },
     {
       langs: "js",
       name: "var/let/const",
-      startToken: [/(var|let|const)[\s]+[\w$]+/],
-      endToken: [/./]
+      starts: [/(var|let|const)[\s]+[\w$]+/],
+      ends: [/./]
     },
     {
       langs: "js",
       name: "var/let/const",
       lastRule: "var/let/const",
-      startToken: [/,[\s]*\r*\n$/],
-      endToken: [/./],
-      endTokenIndent: true,
+      starts: [/,[\s]*\r*\n$/],
+      ends: [/./],
+      endsIndent: true,
       indent: true
     },
     {
       langs: "js",
       name: "var/let/const",
       lastRule: "var/let/const",
-      startToken: [/^,/],
-      endToken: [/./],
+      starts: [/^,/],
+      ends: [/./],
       head: true,
       indent: true,
       lineOffset: -1
@@ -311,24 +312,26 @@ var indent = (function () {
     {
       langs: "js",
       name: "case",
-      startToken: [/^case[\s]+/],
-      endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
-      endTokenIndent: true,
-      indent: true
+      starts: [/^case[\s]+/],
+      ends: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
+      endsIndent: true,
+      indent: true,
+      scope: true
     },
     {
       langs: "js",
       name: "default",
-      startToken: [/^default[\s]*:/],
-      endToken: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
-      endTokenIndent: true,
-      indent: true
+      starts: [/^default[\s]*:/],
+      ends: [/break[\s;]+/, /^case[\s]+/, /^default[\s]+/, /^return([\s]+|;)/, /}/],
+      endsIndent: true,
+      indent: true,
+      scope: true
     },
     {
       langs: "js",
       name: "semicolon",
-      startToken: [SEMICOLON],
-      endToken: [/./]
+      starts: [SEMICOLON],
+      ends: [/./]
     }
   ];
 
@@ -378,10 +381,10 @@ var indent = (function () {
     var newLines = [];
     var indentBuffer = [];
     var activeRules = [];
+    var lastRules= [null];
     var activeCountdowns = [];
     var currentRule;
     var currentCountdown;
-    var lastInactiveRule;
     var indents = 0;
     var l = 0;
     var pos = 0;
@@ -441,6 +444,9 @@ var indent = (function () {
       if (currentRule.rules) {
         modeRules = filterRules(currentRule.rules);
       }
+      if (currentRule.scope) {
+        lastRules.push(null);
+      }
       if (currentRule.debug) {
         debugger;
       }
@@ -449,16 +455,19 @@ var indent = (function () {
     function removeCurrentRule() {
       if (currentRule.indent) {
         consumeIndentation();
-        if (!currentRule.endTokenIndent && matchEnd.matchIndex == 0) {
+        if (!currentRule.endsIndent && matchEnd.matchIndex == 0) {
           calculateIndents();
         }
       }
       if (currentRule.rules) {
         modeRules = null;
       }
+      if (currentRule.scope) {
+        lastRules.pop();
+      }
       activeRules.pop();
       activeCountdowns.pop();
-      lastInactiveRule = currentRule;
+      lastRules[lastRules.length - 1] = currentRule;
       currentRule = activeRules[activeRules.length - 1];
       currentCountdown = activeCountdowns[activeCountdowns.length - 1];
     }
@@ -510,12 +519,14 @@ var indent = (function () {
       var minIndex = string.length;
       var minMatch;
       var match;
+      var lastRuleInScope;
       for (var rule, r = 0; r < rules.length; r++) {
         rule = rules[r];
+        lastRuleInScope = lastRules[lastRules.length - 1];
         if (!rule.lastRule ||
-            (lastInactiveRule && lastInactiveRule.name === rule.lastRule)
+            (lastRuleInScope && lastRuleInScope.name === rule.lastRule)
         ) {
-          match = searchAny(string, rule.startToken, rule);
+          match = searchAny(string, rule.starts, rule);
           if (match.matchIndex != -1 && match.matchIndex < minIndex
             && (!rule.head || index == 0)) {
             minIndex = match.matchIndex;
@@ -543,7 +554,7 @@ var indent = (function () {
   
   function matchEndRule(string, rule, offset) {
     string = string.substr(offset, string.length);
-    var match = searchAny(string, rule.endToken, rule);
+    var match = searchAny(string, rule.ends, rule);
     var cursor = rule.advance ? match.matchIndex + match.matchLength : match.matchIndex;
     return {
       matchIndex: match.matchIndex == -1 ? -1 : match.matchIndex + offset,

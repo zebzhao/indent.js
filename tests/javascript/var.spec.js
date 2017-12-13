@@ -40,6 +40,10 @@ const a = function () {
   },
   c = 10;
 
+// invalid
+var a;,
+,b
+
 `;
     expect(sut(expected, ts)).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
