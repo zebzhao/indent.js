@@ -18,6 +18,7 @@ var indent = (function () {
 
   /**
    * indent - whether rule will cause indent
+   * matchLineIndent - line must have existing indent, otherwise no indent
    * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
    * advance - advance the cursor to the end of the ends
    * endsIndent - keep the indent rule active for the ends
@@ -293,7 +294,7 @@ var indent = (function () {
     {
       langs: "js",
       name: "var/let/const",
-      lastRule: "var/let/const",
+      lastRule: ["var/let/const", "="],
       starts: [/,[\s]*\r*\n$/],
       ends: [/./],
       endsIndent: true,
@@ -302,12 +303,21 @@ var indent = (function () {
     {
       langs: "js",
       name: "var/let/const",
-      lastRule: "var/let/const",
-      starts: [/^,/],
-      ends: [/./],
+      lastRule: ["var/let/const", "="],
+      starts: [/^[,=]/],
+      ends: [/[,=]/, NEW_LINE_REGEX],
       head: true,
       indent: true,
       lineOffset: -1
+    },
+    {
+      langs: "js",
+      name: "=",
+      starts: [/=/],
+      ends: [/[,=]/, NEW_LINE_REGEX],
+      indent: true,
+      matchLineIndent: true,
+      debug: true
     },
     {
       langs: "js",
@@ -376,6 +386,19 @@ var indent = (function () {
 
 
   function indent(code, baseRules, indentation) {
+    /**
+     * Algorithm assumptions
+     *
+     * indentDeltas - store the the deltas in indentation
+     *              - can be manipulated directly to alter the indentation
+     * indentBuffer - used to keep tabs on which lines have open indentation, reset to 0 when closed
+     *              - should be all 0s at the end of each run ideally, can be used to detect errors
+     * activeRuleLines - used to store the active rule's indentation line (this is with offset)
+     *                 - used to keep track of lines for later reference in indentBuffer when dedenting
+     *
+     * Each line can create at most 1 indentation.
+     * When a line is 'used up' for dedent, it cannot be used again, hence the indentBuffer.
+     */
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
     var indentDeltas = [];
@@ -454,10 +477,17 @@ var indent = (function () {
       activeRuleLines.push(line);
       activeRules.push(currentRule);
       activeCountdowns.push(currentRule.countdown);
+
+      if (currentRule.debug) {
+        debugger;
+      }
       if (currentRule.indent) {
-        incrementIndentation(line + 1);
-        indentBuffer[line] = indentBuffer[line] || 0;
-        indentBuffer[line]++;
+        // var hasLineIndent = (indentBuffer[l] || 0) > 0;
+        // if (!currentRule.matchLineIndent || hasLineIndent) {
+          incrementIndentation(line + 1);
+          indentBuffer[line] = indentBuffer[line] || 0;
+          indentBuffer[line]++;
+        // }
       }
       if (currentRule.rules) {
         modeRules = filterRules(currentRule.rules);
@@ -465,18 +495,19 @@ var indent = (function () {
       if (currentRule.scope) {
         lastRules.push(null);
       }
-      if (currentRule.debug) {
-        debugger;
-      }
     }
 
     function removeCurrentRule() {
       var line = activeRuleLines.pop();
+      if (currentRule.debug) {
+        debugger;
+      }
       if (currentRule.indent) {
         // consume indentation
         var matchingIndent = indentBuffer[line] || 0;
         if (matchingIndent > 0) {
-          indentBuffer[line] = 0;
+          // If matching line indent, it means another rule uses the same line
+          if (!currentRule.matchLineIndent) indentBuffer[line] = 0;
           var offset = !currentRule.endsIndent && matchEnd.matchIndex === 0 ? 0 : 1;
           decrementIndentation(l + offset);
         }
@@ -525,7 +556,7 @@ var indent = (function () {
         rule = rules[r];
         lastRuleInScope = lastRules[lastRules.length - 1];
         if (!rule.lastRule ||
-            (lastRuleInScope && lastRuleInScope.name === rule.lastRule)
+            (lastRuleInScope && rule.lastRule.indexOf(lastRuleInScope.name) !== -1)
         ) {
           match = searchAny(string, rule.starts, rule);
           if (match.matchIndex != -1 && match.matchIndex < minIndex
