@@ -15,16 +15,14 @@ a.test
       2,
     ]
   ).
-    
+  
   extend(function () {
-    // invalid
     f.
-      
       g.h.
       
-      i;
+      i([]);
     
-    .j.
+    j.
       k;
   });
 

@@ -1,4 +1,4 @@
-var indent = (function () {
+var indent = (function (root) {
   var rulesCache = {};
 
   function filterRules(language, rules) {
@@ -17,11 +17,19 @@ var indent = (function () {
   var SEMICOLON = /;/;
 
   /**
+   * Soft dedent: this type of dedent has the opposite effect and will actually indent every line
+   * starting from the opening line.
+   */
+
+  /**
    * indent - whether rule will cause indent
    * matchLineIndent - line must have existing indent, otherwise no indent
    * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
    * advance - advance the cursor to the end of the ends
    * endsIndent - keep the indent rule active for the ends
+   * softEnds - see note about soft dedent
+   * ends - list of regex to terminate the rule
+   * starts - list of regex to start the rule
    * head - match at beginning of line only
    * langs - used to filter by language later
    * lineOffset - added to the line field when rule is applied
@@ -72,7 +80,7 @@ var indent = (function () {
             length: startMatch[0].length
           };
         }
-        return {matchIndex: -1};
+        return null;
       }],
       ends: [/<\/script>/i],
       rules: "js",
@@ -95,7 +103,7 @@ var indent = (function () {
             length: startMatch[0].length
           };
         }
-        return {matchIndex: -1};
+        return null;
       }],
       ends: [/<\/style>/i],
       rules: "css",
@@ -159,11 +167,11 @@ var indent = (function () {
               };
             }
             catch (e) {
-              return {matchIndex: -1};
+              return null;
             }
           }
         }
-        return {matchIndex: -1};
+        return null;
       }],
       ends: [function (string) {
         var fromIndex = 0;
@@ -178,9 +186,9 @@ var indent = (function () {
             fromIndex = index + 1;
           }
         }
-        return {
+        return index == -1 ? null : {
           matchIndex: index,
-          length: index == -1 ? 0 : 1
+          length: 1
         };
       }],
       ignore: true,
@@ -247,7 +255,7 @@ var indent = (function () {
       langs: "js",
       name: "dot-chain",
       starts: [/^\.[A-Za-z$_]/],
-      ends: [NEW_LINE_REGEX],
+      ends: [nonWhitespaceFollowByNewline],
       indent: true,
       head: true,
       lineOffset: -1
@@ -255,8 +263,8 @@ var indent = (function () {
     {
       langs: "js",
       name: "dot-chain",
-      starts: [/\.\s*$/],
-      ends: [/[\w$]/],
+      starts: [/\.\s*\r*\n$/],
+      ends: [nonWhitespaceFollowByNewline],
       indent: true
     },
     {
@@ -296,16 +304,15 @@ var indent = (function () {
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/,[\s]*\r*\n$/],
-      ends: [/./],
-      endsIndent: true,
+      ends: [nonWhitespaceFollowByNewline],
       indent: true
     },
     {
       langs: "js",
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
-      starts: [/^[,=]/],
-      ends: [/[,=]/, NEW_LINE_REGEX],
+      starts: [/^,/],
+      ends: [nonWhitespaceFollowByNewline],
       head: true,
       indent: true,
       lineOffset: -1
@@ -314,10 +321,10 @@ var indent = (function () {
       langs: "js",
       name: "=",
       starts: [/=/],
-      ends: [/[,=]/, NEW_LINE_REGEX],
+      softEnds: [/,/],
+      ends: [nonWhitespaceFollowByNewline],
       indent: true,
-      matchLineIndent: true,
-      debug: true
+      matchLineIndent: true
     },
     {
       langs: "js",
@@ -391,23 +398,24 @@ var indent = (function () {
      *
      * indentDeltas - store the the deltas in indentation
      *              - can be manipulated directly to alter the indentation
-     * indentBuffer - used to keep tabs on which lines have open indentation, reset to 0 when closed
-     *              - should be all 0s at the end of each run ideally, can be used to detect errors
-     * activeRuleLines - used to store the active rule's indentation line (this is with offset)
-     *                 - used to keep track of lines for later reference in indentBuffer when dedenting
+     * indentBuffer - used to keep tabs on the number of open indentations on each line.
+     *              - an array of boolean values is kept to keep track of indentation per line
+     *                - true values indicate this is a true indentation
+     *                - false values indicate this indentation depends on the overall true indentation
+     *                  after subtracting away dedents being positive, otherwise it doesn't count
+     * dedentBuffer - each line in the buffer has an array storing open indent lines to be closed
+     *              - an array of numbers is used to reference the opening line
+     *              - a negative number is used to signify a soft dedent (see note about soft dedent)
      *
      * Each line can create at most 1 indentation.
      * When a line is 'used up' for dedent, it cannot be used again, hence the indentBuffer.
      */
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
-    var indentDeltas = [];
-    var indentBuffer = [];
-    var activeRules = [];
-    var activeRuleLines = [];
+    var indentBuffer = arrayOfArrays(lineCount);
+    var dedentBuffer = arrayOfArrays(lineCount);
+    var activeMatches = [];
     var lastRules= [null];
-    var activeCountdowns = [];
-    var currentRule;
     var currentCountdown;
     var l = 0;
     var pos = 0;
@@ -420,12 +428,13 @@ var indent = (function () {
 
       matchStart = matchStartRule(lineToMatch, modeRules || baseRules, pos);
 
-      if (activeRules.length) {
-        matchEnd = matchEndRule(lineToMatch, currentRule, pos);
+      if (activeMatches.length) {
+        var activeMatch = activeMatches[activeMatches.length-1];
+        matchEnd = matchEndRule(lineToMatch, activeMatch, pos);
         if (matchEnd.matchIndex == -1) {
-          if (currentRule.ignore) {
+          if (activeMatch.rule.ignore) {
             // last rule is still active, and it's telling us to ignore.
-            incrementLine();
+            l++; pos = 0;
             continue;
           } else if (currentCountdown) {
             currentCountdown--;
@@ -435,7 +444,7 @@ var indent = (function () {
           }
         }
         else if (
-          currentRule.ignore ||
+          activeMatch.rule.ignore ||
           matchStart.matchIndex == -1 ||
           matchEnd.matchIndex <= matchStart.matchIndex) {
           removeCurrentRule();
@@ -449,100 +458,92 @@ var indent = (function () {
       }
       else {
         // No new token match end, no new match start
-        incrementLine();
+        l++; pos = 0;
       }
     }
 
+    console.log(dedentBuffer);
+    console.log(indentBuffer);
+
     var
-      indents = 0,
+      hardIndentCount, softIndentCount,
+      dedentLines, dedentLine, dedents,
+      i, j, indents = 0,
+      hardIndents = intArray(lineCount),
+      indentDeltas = intArray(lineCount),
       newLines = [];
 
-    for (var i=0; i<lines.length; i++) {
+    for (i=0; i<lineCount; i++) {
+      hardIndentCount = sum(indentBuffer[i]);
+      softIndentCount = indentBuffer[i].length - hardIndentCount;
+      hardIndents[i] = hardIndentCount;
+      dedentLines = dedentBuffer[i];
+      dedents = 0;
+      for (j=0; j<dedentLines.length; j++) {
+        dedentLine = dedentLines[j];
+        if (hardIndents[dedentLine] > 0) {
+          hardIndents[dedentLine]--;
+          dedents += dedentLine !== i;
+        }
+      }
+      hardIndentCount = hardIndents[i] > 0 ? softIndentCount + 1 : 0;
+      hardIndents[i] = hardIndentCount;
+      indentDeltas[i] = hardIndentCount - dedents;
+    }
+
+    for (i=0; i<lineCount; i++) {
       indents += indentDeltas[i] || 0;
       newLines.push((indents > 0 ? repeatString(indentation, indents) : '') + lines[i].trim());
     }
 
+    console.log(hardIndents);
     console.log(indentDeltas);
-    console.log(indentBuffer);
 
     return newLines.join('\r\n');
 
 
     function implementRule(match) {
       pos = match.cursor;
-      currentRule = match.rule;
       currentCountdown = match.countdown;
 
-      var line = l + (currentRule.lineOffset || 0);
-      activeRuleLines.push(line);
-      activeRules.push(currentRule);
-      activeCountdowns.push(currentRule.countdown);
+      var rule = match.rule;
+      var line = (l + 1) + (rule.lineOffset || 0);
+      match.line = line;
+      activeMatches.push(match);
 
-      if (currentRule.debug) {
+      if (rule.debug) {
         debugger;
       }
-      if (currentRule.indent) {
-        // var hasLineIndent = (indentBuffer[l] || 0) > 0;
-        // if (!currentRule.matchLineIndent || hasLineIndent) {
-          incrementIndentation(line + 1);
-          indentBuffer[line] = indentBuffer[line] || 0;
-          indentBuffer[line]++;
-        // }
+      if (rule.indent) {
+        indentBuffer[line].push(!rule.matchLineIndent);
       }
-      if (currentRule.rules) {
-        modeRules = filterRules(currentRule.rules);
+      if (rule.rules) {
+        modeRules = filterRules(rule.rules);
       }
-      if (currentRule.scope) {
+      if (rule.scope) {
         lastRules.push(null);
       }
     }
 
     function removeCurrentRule() {
-      var line = activeRuleLines.pop();
-      if (currentRule.debug) {
+      var match = activeMatches.pop(),
+        line = match.line,
+        rule = match.rule;
+      if (rule.debug) {
         debugger;
       }
-      if (currentRule.indent) {
-        // consume indentation
-        var matchingIndent = indentBuffer[line] || 0;
-        if (matchingIndent > 0 || currentRule.matchLineIndent) {
-          // If matching line indent, it means another rule uses the same line
-          if (!currentRule.matchLineIndent) indentBuffer[line] = 0;
-          var offset = !currentRule.endsIndent && matchEnd.matchIndex === 0 ? 0 : 1;
-          decrementIndentation(l + offset);
-        }
+      if (rule.indent) {
+        var offset = !rule.endsIndent && matchEnd.matchIndex === 0 ? 0 : 1;
+        dedentBuffer[l + offset].push(matchEnd.softIndent ? -line : line);
       }
-      if (currentRule.rules) {
+      if (rule.rules) {
         modeRules = null;
       }
-      if (currentRule.scope) {
+      if (rule.scope) {
         lastRules.pop();
       }
-      activeRules.pop();
-      activeCountdowns.pop();
-      lastRules[lastRules.length - 1] = currentRule;
-      currentRule = activeRules[activeRules.length - 1];
-      currentCountdown = activeCountdowns[activeCountdowns.length - 1];
-    }
-
-    function incrementLine() {
-      l++;
-      pos = 0;
-    }
-
-    function incrementIndentation(line, force) {
-      var indentsAtLine = indentDeltas[line] || 0;
-      if (force || indentsAtLine < 0) {
-        indentDeltas[line] = indentsAtLine + 1;
-      }
-      else if (indentsAtLine === 0) {
-        indentDeltas[line] = 1;
-      }
-    }
-
-    function decrementIndentation(line) {
-      var indentsAtLine = indentDeltas[line] || 0;
-      indentDeltas[line] = indentsAtLine - 1;
+      lastRules[lastRules.length - 1] = rule;
+      currentCountdown = activeMatches.length ? activeMatches[activeMatches.length - 1].rule.countdown : 0;
     }
 
     function matchStartRule(string, rules, index) {
@@ -570,10 +571,34 @@ var indent = (function () {
       return {
         rule: result,
         matchIndex: result ? minIndex + index : -1,
-        cursor: result ? minIndex + index + minMatch.matchLength : -1
+        cursor: result ? index + minMatch.cursor : -1,
+        state: match.state
       };
     }
+  }
 
+  function arrayOfArrays(length) {
+    var array = new Array(length);
+    for (var i=0; i<length; i++) array[i] = [];
+    return array;
+  }
+
+  function intArray(length) {
+    if (root.Int16Array) {
+      return new Int16Array(length);
+    } else {
+      var array = new Array(length);
+      for (var i=0; i<length; i++) array[i] = 0;
+      return array;
+    }
+  }
+
+  function sum(array) {
+    var i, count = 0;
+    for (i=0; i<array.length; i++) {
+      count += !!array[i];
+    }
+    return count;
   }
 
   function repeatString(baseString, repeat) {
@@ -583,40 +608,70 @@ var indent = (function () {
   function cleanEscapedChars(string) {
     return string.replace(/\\(u[0-9A-Za-z]{4}|u\{[0-9A-Za-z]{1,6}]\}|x[0-9A-Za-z]{2}|.)/g, '0');
   }
+
+  function nonWhitespaceFollowByNewline(string, rule, state) {
+    if (!state.newline) {
+      state.newline = string.search(/[^\s\r\n]/) !== -1;
+    } else {
+      var index = string.search(/\r*\n/);
+      if (index !== -1) {
+        return {
+          matchIndex: 0,
+          length: 1
+        }
+      }
+    }
+    return null;
+  }
   
-  function matchEndRule(string, rule, offset) {
+  function matchEndRule(string, active, offset) {
     string = string.substr(offset, string.length);
-    var match = searchAny(string, rule.ends, rule);
-    var cursor = rule.advance ? match.matchIndex + match.matchLength : match.matchIndex;
+    var rule = active.rule;
+    var softIndent = false;
+    var match = searchAny(string, rule.ends, rule, active.state);
+    if (rule.softEnds) {
+      match = searchAny(string, rule.softEnds, rule, active.state);
+      softIndent = match.matchIndex !== -1;
+    }
+    var cursor = rule.advance ? match.cursor : match.matchIndex;
     return {
-      matchIndex: match.matchIndex == -1 ? -1 : match.matchIndex + offset,
-      cursor: cursor == -1 ? -1 : cursor + offset
+      matchIndex: match.matchIndex === -1 ? -1 : match.matchIndex + offset,
+      cursor: cursor == -1 ? -1 : cursor + offset,
+      softIndent: softIndent,
+      state: match.state
     };
   }
 
-  function searchAny(string, patterns, rule) {
-    var index = -1;
-    var length = 0;
+  function searchAny(string, patterns, rule, state) {
+    state = state || {};
+
+    var index = -1,
+      length = 0,
+      match;
+
     for (var pat, p = 0; p < patterns.length; p++) {
       pat = patterns[p];
       if (typeof pat == 'function') {
-        var match = pat(string, rule);
-        index = match.matchIndex;
-        length = match.length;
+        match = pat(string, rule, state);
+        if (match) {
+          index = match.matchIndex;
+          length = match.length;
+          break;
+        }
       }
       else {
-        index = string.search(pat);
-        if (index != -1) {
-          length = string.match(pat)[0].length;
+        match = string.match(pat);
+        if (match) {
+          index = string.search(pat);
+          length = match[0].length;
           break;
         }
       }
     }
     return {
       matchIndex: index,
-      matchLength: length,
       cursor: index + length,
-      patternIndex: p
+      state: state
     };
   }
-}());
+}(this));
