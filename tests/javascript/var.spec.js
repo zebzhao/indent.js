@@ -20,12 +20,18 @@ const
   
   a, b=[1
     ,2]
-    
+
 let
   a, b={
     c: d,
   }
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 
+  it('var', function () {
+    var expected = `
 var a = {
   b: c,
   d: e,
@@ -37,7 +43,23 @@ let a = {
   },
   
   f=1, g, h;
-  
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('function', function () {
+    var expected = `
+function () {
+  statement;
+}
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('function', function () {
+    var expected = `
 const a = function () {
     statement;
   }
@@ -49,7 +71,6 @@ const a = function () {
 // invalid
 var a;,
 ,b
-
 `;
     expect(sut(expected, ts)).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
