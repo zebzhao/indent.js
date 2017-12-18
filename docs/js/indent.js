@@ -255,7 +255,7 @@ var indent = (function (root) {
       langs: "js",
       name: "dot-chain",
       starts: [/^\.[A-Za-z$_]/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [SEMICOLON, /\./, nonWhitespaceFollowByNewline],
       indent: true,
       head: true,
       lineOffset: -1
@@ -264,7 +264,7 @@ var indent = (function (root) {
       langs: "js",
       name: "dot-chain",
       starts: [/\.\s*\r*\n/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [/[^\s]\s*\r*\n/],
       indent: true
     },
     {
