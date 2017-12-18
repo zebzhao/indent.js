@@ -263,7 +263,7 @@ var indent = (function (root) {
     {
       langs: "js",
       name: "dot-chain",
-      starts: [/\.\s*\r*\n$/],
+      starts: [/\.\s*\r*\n/],
       ends: [nonWhitespaceFollowByNewline],
       indent: true
     },
@@ -288,7 +288,7 @@ var indent = (function (root) {
     {
       langs: "js",
       name: "var/let/const",
-      starts: [/(var|let|const)[\s]*\r*\n$/],
+      starts: [/(var|let|const)[\s]*\r*\n/],
       ends: [/[\w$]/],
       indent: true,
       endsIndent: true
@@ -303,7 +303,7 @@ var indent = (function (root) {
       langs: "js",
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
-      starts: [/,[\s]*\r*\n$/],
+      starts: [/,[\s]*\r*\n/],
       ends: [nonWhitespaceFollowByNewline],
       indent: true
     },
@@ -312,7 +312,7 @@ var indent = (function (root) {
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/^,/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [/./],
       head: true,
       indent: true,
       lineOffset: -1
@@ -321,10 +321,10 @@ var indent = (function (root) {
       langs: "js",
       name: "=",
       starts: [/=/],
-      softEnds: [/,/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [nonWhitespaceFollowByNewline, /,/],
       indent: true,
-      matchLineIndent: true
+      matchLineIndent: true,
+      debug: true
     },
     {
       langs: "js",
@@ -486,7 +486,11 @@ var indent = (function (root) {
           dedents += dedentLine !== i;
         }
       }
-      hardIndentCount = hardIndents[i] > 0 ? softIndentCount + 1 : 0;
+      if (hardIndents[i] > 0) {
+        hardIndentCount = dedentBuffer[i+1].length > 0 ? softIndentCount + 1 : 1;
+      } else {
+        hardIndentCount = 0;
+      }
       hardIndents[i] = hardIndentCount;
       indentDeltas[i] = hardIndentCount - dedents;
     }
@@ -610,13 +614,16 @@ var indent = (function (root) {
   }
 
   function nonWhitespaceFollowByNewline(string, rule, state) {
+    if (rule.debug) {
+      debugger
+    }
     if (!state.newline) {
       state.newline = string.search(/[^\s\r\n]/) !== -1;
     } else {
       var index = string.search(/\r*\n/);
       if (index !== -1) {
         return {
-          matchIndex: 0,
+          matchIndex: index,
           length: 1
         }
       }
