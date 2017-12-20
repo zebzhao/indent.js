@@ -2,7 +2,7 @@ var sut = require('../../lib/indent').js;
 var expect = require('chai').expect;
 var ts = '  ';
 
-describe('dot-chain', function () {
+describe('brackets', function () {
   it('all', function () {
     var expected = `
 ({
