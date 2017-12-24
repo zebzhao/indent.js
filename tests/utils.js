@@ -1,4 +1,4 @@
-function hereDoc(f) {
+export function hereDoc(f) {
     return f.toString()
         .replace(/^[^\/]+\/\*!?/, '')
         .replace(/\*\/[^\/]+$/, '')
