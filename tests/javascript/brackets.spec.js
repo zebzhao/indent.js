@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var ts = '  ';
 
 describe('brackets', function () {
-  it('all', function () {
+  it('multiple open and close brackets on same line', function () {
     var expected = `
 ({
   a: [

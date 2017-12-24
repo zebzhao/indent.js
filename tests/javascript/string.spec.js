@@ -3,25 +3,15 @@ var expect = require('chai').expect;
 var ts = '  ';
 
 describe('string', function () {
-  it('all', function () {
+
+  it('simple empty string def', function () {
     var expected = `
-"\""
-
-{
-  a: 1
-}
-
-'""'
-
-{
-  b: 2
-}
-
-'\''
-{
-  c: 3
-}
+var a = '',
+  b = "",
+  c =\`\`;
 `;
-    expect(expected).toBe(sut(expected, ts));
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
   });
+
 });
