@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var ts = '  ';
 
 describe('object', function () {
-  it('all', function () {
+  it('complex object declaration', function () {
     var expected = `
 {
   a: {

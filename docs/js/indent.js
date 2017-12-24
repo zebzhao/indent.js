@@ -195,15 +195,21 @@ var indent = (function (root) {
     {
       langs: "js css html",
       name: "string",
-      starts: [/\"/],
-      ends: [/\"/, NEW_LINE_REGEX],
+      starts: [/(''|""|``)/],
+      ends: [/./, NEW_LINE_REGEX]
+    },
+    {
+      langs: "js css html",
+      name: "string",
+      starts: [/\"(?=[^"])/],
+      ends: [/[^\\]\"/, NEW_LINE_REGEX],
       ignore: true,
       advance: true
     },
     {
       langs: "js css html",
       name: "string",
-      starts: [/\'[^']/],
+      starts: [/\'(?=[^'])/],
       ends: [/[^\\]\'/, NEW_LINE_REGEX],
       ignore: true,
       advance: true
@@ -211,7 +217,7 @@ var indent = (function (root) {
     {
       langs: "js css html",
       name: "string",
-      starts: [/\`[^`]/],
+      starts: [/\`(?=[^`])/],
       ends: [/[^\\]\`/],
       ignore: true,
       advance: true
@@ -253,7 +259,7 @@ var indent = (function (root) {
       langs: "js",
       name: "dot-chain",
       starts: [/^\.[A-Za-z$_]/],
-      ends: [/\./],
+      ends: [/[\.;]/],
       indent: true,
       head: true,
       lineOffset: -1
@@ -262,7 +268,7 @@ var indent = (function (root) {
       langs: "js",
       name: "dot-chain",
       starts: [/\.\s*\r*\n/],
-      ends: [/[^\s]\s*\r*\n/],
+      ends: [/[\.;]/, /[^\s]\s*\r*\n/],
       indent: true
     },
     {
@@ -473,8 +479,10 @@ var indent = (function (root) {
       for (j=0; j<dedentLines.length; j++) {
         dedentLine = dedentLines[j];
         if (dedentLine < 0) {
-          indentDeltas[-dedentLine]++;
-          dedents += 1;
+          if (-dedentLine !== i) {
+            indentDeltas[-dedentLine]++;
+            dedents += 1;
+          }
         }
         else if (hardIndents[dedentLine] > 0) {
           hardIndents[dedentLine]--;
