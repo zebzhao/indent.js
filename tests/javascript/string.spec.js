@@ -40,4 +40,14 @@ var a = \`
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
+  it('escape quotes', function () {
+    var expected = `
+var a = '0\\'',
+  b = "1\\"",
+  c = \`2\\\`\`
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
 });

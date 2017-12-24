@@ -309,7 +309,7 @@ var indent = (function (root) {
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/,[\s]*\r*\n/],
-      ends: [/,/, nonWhitespaceFollowByNewline],
+      ends: [/[,;]/, nonWhitespaceFollowByNewline],
       indent: true,
       callback: postIndentForCommaAfterEqual
     },
@@ -318,7 +318,7 @@ var indent = (function (root) {
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/^,/],
-      ends: [/,/, nonWhitespaceFollowByNewline],
+      ends: [/[,;]/, nonWhitespaceFollowByNewline],
       head: true,
       indent: true,
       lineOffset: -1,

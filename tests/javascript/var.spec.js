@@ -20,6 +20,15 @@ const
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
+  it('const: multiple commas', function () {
+    var expected = `
+const a = "",
+  b;
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
   it('const: multiple equals', function () {
     var expected = `
 var a = 0,
@@ -153,6 +162,22 @@ let a = {
   },
   
   f=1, g, h;
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('let: multiple array, objects, regex', function () {
+    var expected = `
+let a=[0,
+    1, {
+      b: 1}
+  ]
+  ,c="",
+  d=[
+    2,3,
+    /^([^.]*)/
+  ]
 `;
     expect(sut(expected, ts)).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));

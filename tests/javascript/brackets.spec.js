@@ -22,4 +22,22 @@ describe('brackets', function () {
     expect(sut(expected, ts)).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('iife', function () {
+    var expected = `
+(function() {
+  function a(b, c) {
+    statement;
+  }
+})();
+
+(function() {
+  function a(b, c) {
+    statement;
+  }
+}());
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 });
