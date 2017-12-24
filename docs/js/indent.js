@@ -412,6 +412,7 @@ var indent = (function (root) {
      */
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
+    var ignoreBuffer = intArray(lineCount);
     var indentBuffer = intArray(lineCount);
     var dedentBuffer = arrayOfArrays(lineCount);
     var activeMatches = [];
@@ -421,19 +422,21 @@ var indent = (function (root) {
     var pos = 0;
     var matchEnd, matchStart;
     var modeRules = null;
+    var line, lineToMatch, activeMatch;
 
     while (l < lineCount) {
-      var line = lines[l].trim();
-      var lineToMatch = cleanEscapedChars(line) + '\r\n';
+      line = lines[l].trim();
+      lineToMatch = cleanEscapedChars(line) + '\r\n';
+      activeMatch = activeMatches[activeMatches.length-1];
 
       matchStart = matchStartRule(lineToMatch, modeRules || baseRules, pos);
 
       if (activeMatches.length) {
-        var activeMatch = activeMatches[activeMatches.length-1];
         matchEnd = matchEndRule(lineToMatch, activeMatch, pos);
         if (matchEnd.matchIndex == -1) {
           if (activeMatch.rule.ignore) {
             // last rule is still active, and it's telling us to ignore.
+            ignoreBuffer[l] = 1;
             l++; pos = 0;
             continue;
           } else if (currentCountdown) {
@@ -464,6 +467,7 @@ var indent = (function (root) {
 
     console.log(dedentBuffer);
     console.log(indentBuffer);
+    console.log(ignoreBuffer);
 
     var
       hardIndentCount,
@@ -496,8 +500,12 @@ var indent = (function (root) {
     }
 
     for (i=0; i<lineCount; i++) {
-      indents += indentDeltas[i] || 0;
-      newLines.push((indents > 0 ? repeatString(indentation, indents) : '') + lines[i].trim());
+      if (ignoreBuffer[i] === 0) {
+        indents += indentDeltas[i] || 0;
+        newLines.push((indents > 0 ? repeatString(indentation, indents) : '') + lines[i].trim());
+      } else {
+        newLines.push(lines[i]);
+      }
     }
 
     console.log(hardIndents);
