@@ -26,7 +26,6 @@ var indent = (function (root) {
    * ignore - ignore further rule matching as long as this is last active rule, e.g. string, comments
    * advance - advance the cursor to the end of the ends
    * endsIndent - keep the indent rule active for the ends
-   * softEnds - see note about soft dedent
    * ends - list of regex to terminate the rule
    * starts - list of regex to start the rule
    * head - match at beginning of line only
@@ -296,7 +295,7 @@ var indent = (function (root) {
       langs: "js",
       name: "var/let/const",
       starts: [/(var|let|const)\s+[\w$]+/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [/[,;=]/, nonWhitespaceFollowByNewline],
       indent: true
     },
     {
@@ -304,18 +303,20 @@ var indent = (function (root) {
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/,[\s]*\r*\n/],
-      ends: [nonWhitespaceFollowByNewline],
-      indent: true
+      ends: [/,/, nonWhitespaceFollowByNewline],
+      indent: true,
+      callback: postIndentForCommaAfterEqual
     },
     {
       langs: "js",
       name: "var/let/const",
       lastRule: ["var/let/const", "="],
       starts: [/^,/],
-      ends: [nonWhitespaceFollowByNewline],
+      ends: [/,/, nonWhitespaceFollowByNewline],
       head: true,
       indent: true,
-      lineOffset: -1
+      lineOffset: -1,
+      callback: postIndentForCommaAfterEqual
     },
     {
       langs: "js",
@@ -408,7 +409,7 @@ var indent = (function (root) {
     var indentBuffer = intArray(lineCount);
     var dedentBuffer = arrayOfArrays(lineCount);
     var activeMatches = [];
-    var lastRules= [null];
+    var lastMatches= [null];
     var currentCountdown;
     var l = 0;
     var pos = 0;
@@ -471,7 +472,11 @@ var indent = (function (root) {
       dedents = 0;
       for (j=0; j<dedentLines.length; j++) {
         dedentLine = dedentLines[j];
-        if (hardIndents[dedentLine] > 0) {
+        if (dedentLine < 0) {
+          indentDeltas[-dedentLine]++;
+          dedents += 1;
+        }
+        else if (hardIndents[dedentLine] > 0) {
           hardIndents[dedentLine]--;
           dedents += dedentLine !== i;
         }
@@ -512,7 +517,11 @@ var indent = (function (root) {
         modeRules = filterRules(rule.rules);
       }
       if (rule.scope) {
-        lastRules.push(null);
+        lastMatches.push(null);
+      }
+      if (rule.callback) {
+        debugger
+        rule.callback(match, indentBuffer, dedentBuffer);
       }
     }
 
@@ -525,15 +534,15 @@ var indent = (function (root) {
       }
       if (rule.indent) {
         var offset = !rule.endsIndent && matchEnd.matchIndex === 0 ? 0 : 1;
-        dedentBuffer[l + offset].push(matchEnd.softEnd ? -line : line);
+        dedentBuffer[l + offset].push(line);
       }
       if (rule.rules) {
         modeRules = null;
       }
       if (rule.scope) {
-        lastRules.pop();
+        lastMatches.pop();
       }
-      lastRules[lastRules.length - 1] = rule;
+      lastMatches[lastMatches.length - 1] = match;
       currentCountdown = activeMatches.length ? activeMatches[activeMatches.length - 1].rule.countdown : 0;
     }
 
@@ -543,12 +552,14 @@ var indent = (function (root) {
       var minIndex = string.length;
       var minMatch;
       var match;
-      var lastRuleInScope;
+
+      var lastMatch = lastMatches[lastMatches.length - 1];
+      var lastRuleInScope = lastMatch ? lastMatch.rule.name : '';
+
       for (var rule, r = 0; r < rules.length; r++) {
         rule = rules[r];
-        lastRuleInScope = lastRules[lastRules.length - 1];
         if (!rule.lastRule ||
-            (lastRuleInScope && rule.lastRule.indexOf(lastRuleInScope.name) !== -1)
+            (lastRuleInScope && rule.lastRule.indexOf(lastRuleInScope) !== -1)
         ) {
           match = searchAny(string, rule.starts, rule);
           if (match.matchIndex != -1 && match.matchIndex < minIndex
@@ -563,7 +574,8 @@ var indent = (function (root) {
         rule: result,
         matchIndex: result ? minIndex + index : -1,
         cursor: result ? index + minMatch.cursor : -1,
-        state: match.state
+        state: match.state,
+        lastMatch: lastMatch
       };
     }
   }
@@ -590,6 +602,13 @@ var indent = (function (root) {
 
   function cleanEscapedChars(string) {
     return string.replace(/\\(u[0-9A-Za-z]{4}|u\{[0-9A-Za-z]{1,6}]\}|x[0-9A-Za-z]{2}|.)/g, '0');
+  }
+
+  function postIndentForCommaAfterEqual(match, indentBuffer, dedentBuffer) {
+    var lastMatch = match.lastMatch;
+    if (lastMatch && lastMatch.rule.name === "=") {
+      dedentBuffer[match.line].push(-lastMatch.line);
+    }
   }
 
   function nonWhitespaceFollowByNewline(string, rule, state) {
