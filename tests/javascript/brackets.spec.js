@@ -3,6 +3,21 @@ var expect = require('chai').expect;
 var ts = '  ';
 
 describe('brackets', function () {
+  
+  it('big if statement', function () {
+    var expected = `
+if (
+  (open && (
+    (next.text === ']' && open.text === '[') ||
+    (next.text === ')' && open.text === '(') ||
+    (next.text === '}' && open.text === '{')))) {
+  statement;
+}
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
   it('multiple open and close brackets on same line', function () {
     var expected = `
 ({

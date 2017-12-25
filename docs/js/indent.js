@@ -297,7 +297,7 @@ var indent = (function (root) {
     {
       langs: "js",
       name: "var/let/const",
-      starts: [/(var|let|const)\s+[\w$]+/],
+      starts: [/(var|let|const)\s+(?=[\w$])/],
       ends: [/[,;=]/, nonWhitespaceFollowByNewline],
       indent: true
     },
@@ -320,6 +320,12 @@ var indent = (function (root) {
       indent: true,
       lineOffset: -1,
       callback: postIndentForCommaAfterEqual
+    },
+    {
+      langs: "js",
+      name: "equality",
+      starts: [/[=<>!]=(=)?/],
+      ends: [/./]
     },
     {
       langs: "js",
@@ -429,7 +435,7 @@ var indent = (function (root) {
 
       if (activeMatches.length) {
         matchEnd = matchEndRule(lineToMatch, activeMatch, pos, matchStart);
-        if (matchEnd.matchIndex == -1) {
+        if (matchEnd.matchIndex === -1) {
           if (activeMatch.rule.ignore) {
             // last rule is still active, and it's telling us to ignore.
             ignoreBuffer[l] = 1;
@@ -439,7 +445,7 @@ var indent = (function (root) {
         }
         else if (
           activeMatch.rule.ignore ||
-          matchStart.matchIndex == -1 ||
+          matchStart.matchIndex === -1 ||
           matchEnd.matchIndex <= matchStart.matchIndex) {
           removeCurrentRule();
           pos = matchEnd.cursor;
@@ -447,7 +453,7 @@ var indent = (function (root) {
         }
       }
 
-      if (matchStart.matchIndex != -1) {
+      if (matchStart.matchIndex !== -1) {
         implementRule(matchStart);
       }
       else {
@@ -459,6 +465,7 @@ var indent = (function (root) {
     console.log(dedentBuffer);
     console.log(indentBuffer);
     console.log(ignoreBuffer);
+    console.log(activeMatches);
 
     var
       hardIndentCount,
