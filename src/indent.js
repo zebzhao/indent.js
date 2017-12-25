@@ -225,7 +225,7 @@ var indent = (function (root) {
       langs: "js",
       name: "if",
       starts: [/^if\s*(?=\()/, /[\s]+if\s*(?=\()/],
-      ends: [/else[\s]+/, /[{;]/, nonWhitespaceFollowByNewline],
+      ends: [/else[\s]+/, nonWhitespaceFollowByNewline, /[{;]/],
       indent: true,
       debug: true
     },
@@ -233,14 +233,14 @@ var indent = (function (root) {
       langs: "js",
       name: "for",
       starts: [/^for\s*(?=\()/],
-      ends: [/[{;]/, nonWhitespaceFollowByNewline],
+      ends: [nonWhitespaceFollowByNewline, /[{;]/],
       indent: true
     },
     {
       langs: "js",
       name: "else",
       starts: [/else[\s]+/],
-      ends: [/if/, /[{;]/, nonWhitespaceFollowByNewline],
+      ends: [/if[^\w$]/, nonWhitespaceFollowByNewline, /[{;]/],
       indent: true
     },
     {
