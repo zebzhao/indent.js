@@ -50,4 +50,16 @@ var a = '0\\'',
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
+  it('quotes inside quotes', function () {
+    var expected = `
+var a = '"',
+  b = "'",
+  c = "\`",
+  d = \`"\`,
+  e = \`'\`
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
 });

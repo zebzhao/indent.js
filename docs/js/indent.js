@@ -56,8 +56,17 @@ var indent = (function (root) {
     },
     {
       $languages: "html",
-      $name: "link|br|hr|input|img|meta",
-      $startPatterns: [/\<(link|br|hr|input|img|meta)/i],
+      $name: "html-tag",
+      $startPatterns: [/\<html/i],
+      $endPatterns: [/>/],
+      $ignoreRules: true,
+      $consumeEndMatch: true
+    },
+    {
+      $languages: "html",
+      $name: "void-tags",
+      $startPatterns: [
+        /\<(area|base|br|col|command|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)/i],
       $endPatterns: [/>/],
       $consumeEndMatch: true
     },
@@ -106,13 +115,6 @@ var indent = (function (root) {
       $consumeEndMatch: true,
       $indent: true,
       $newScope: true
-    },
-    {
-      $languages: "html",
-      $name: "close-tag",
-      $startPatterns: [/<\/[A-Za-z0-9\-]+>/],
-      $endPatterns: [/./],
-      $indent: true
     },
     {
       $languages: "html",
@@ -330,6 +332,14 @@ var indent = (function (root) {
       $name: "=",
       $startPatterns: [/=/],
       $endPatterns: [/[,;]/, NEW_LINE_REGEX]
+    },
+    {
+      $languages: "js",
+      $name: "?:",
+      $startPatterns: [/\?/],
+      $endPatterns: [/[:;]/],
+      $endPatternIndent: true,
+      $indent: true
     },
     {
       $languages: "js",

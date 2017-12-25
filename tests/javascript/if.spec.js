@@ -30,7 +30,19 @@ else
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
-  it('if: multiple lines before expression', function () {
+  it('if: single line', function () {
+    var expected = `
+if (a)
+  if (b) {var c=0;}
+else var d=0;
+for(var e=0)
+  statement(f);
+`;
+    expect(sut(expected, ts)).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('if: single line with multiple lines before expression', function () {
     var expected = `
 if (a)
   
