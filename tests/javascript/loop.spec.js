@@ -6,6 +6,8 @@ describe('loop', function () {
   it('for: single line', function () {
     var expected = `
 for (var a in b) c.push(d);
+for (var e,f; e<0
+  ; e++) g.push(h);
 `;
     expect(sut(expected, ts)).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));

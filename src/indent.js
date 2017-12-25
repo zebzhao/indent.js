@@ -227,12 +227,12 @@ var indent = (function (root) {
       $name: "if",
       $startPatterns: [/^if\s*(?=\()/, /[\s]+if\s*(?=\()/],
       $endPatterns: [/else[\s]+/, nonWhitespaceFollowByNewline, /[{;]/],
-      $indent: true,
+      $indent: true
     },
     {
       $languages: "js",
-      $name: "for",
-      $startPatterns: [/^for\s*(?=\()/],
+      $name: "for|while",
+      $startPatterns: [/^(for|while)\s*(?=\()/],
       $endPatterns: [nonWhitespaceFollowByNewline, /[{;]/],
       $indent: true
     },
@@ -246,7 +246,7 @@ var indent = (function (root) {
     {
       $languages: "js css",
       $name: "bracket",
-      $startPatterns: [/\(/],
+      $startPatterns: [/\(\s*(var|let|const)?\s*/],
       $endPatterns: [/\)/],
       $indent: true,
       $consumeEndMatch: true,
@@ -331,7 +331,7 @@ var indent = (function (root) {
       $languages: "js",
       $name: "=",
       $startPatterns: [/=/],
-      $endPatterns: [/[,;]/, NEW_LINE_REGEX]
+      $endPatterns: [/[,;\)\]}]/, NEW_LINE_REGEX]
     },
     {
       $languages: "js",
