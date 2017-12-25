@@ -6,18 +6,22 @@ var umd = require('gulp-umd');
 gulp.task('build', ['build-minify', 'build-debug', 'build-docs']);
 
 gulp.task('build-minify', function (cb) {
-    return gulp.src(['src/**/*.js'])
-        .pipe(concat('indent.min.js'))
-        .pipe(umd({
-            exports: function(file) {
-                return 'indent';
-            },
-            namespace: function(file) {
-                return 'indent';
-            }
-        }))
-        .pipe(uglify())
-        .pipe(gulp.dest('./lib'))
+  return gulp.src(['src/**/*.js'])
+    .pipe(concat('indent.min.js'))
+    .pipe(umd({
+      exports: function (file) {
+        return 'indent';
+      },
+      namespace: function (file) {
+        return 'indent';
+      }
+    }))
+    .pipe(uglify({
+      mangleProperties: {
+        regex: /^\$/
+      }
+    }))
+    .pipe(gulp.dest('./lib'))
 });
 
 gulp.task('build-docs', function (cb) {
@@ -26,15 +30,15 @@ gulp.task('build-docs', function (cb) {
 });
 
 gulp.task('build-debug', function (cb) {
-    return gulp.src(['src/**/*.js'])
-        .pipe(concat('indent.js'))
-        .pipe(umd({
-            exports: function(file) {
-                return 'indent';
-            },
-            namespace: function(file) {
-                return 'indent';
-            }
-        }))
-        .pipe(gulp.dest('./lib'));
+  return gulp.src(['src/**/*.js'])
+    .pipe(concat('indent.js'))
+    .pipe(umd({
+      exports: function (file) {
+        return 'indent';
+      },
+      namespace: function (file) {
+        return 'indent';
+      }
+    }))
+    .pipe(gulp.dest('./lib'));
 });

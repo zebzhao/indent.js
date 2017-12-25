@@ -2,7 +2,7 @@ var sut = require('../../lib/indent').js;
 var expect = require('chai').expect;
 var ts = '  ';
 
-describe('statements', function () {
+describe('if', function () {
 
   it('if: single line with object', function () {
     var expected = `
