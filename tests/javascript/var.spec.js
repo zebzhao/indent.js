@@ -16,7 +16,7 @@ const
     2
   ]
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -25,7 +25,7 @@ const
 const a = "",
   b;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -35,7 +35,7 @@ var a = 0,
   b = 1,
   c = 2;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -51,7 +51,7 @@ const a = function () {
   },
   c = 10;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -69,7 +69,7 @@ var a,
   
   c={}
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -81,7 +81,7 @@ var
     statement;
   }
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -91,7 +91,7 @@ var
 var a;,
 ,b
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -103,7 +103,7 @@ let a
   ,c=[0
     ,1]
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -115,7 +115,7 @@ var a,
 
   ,e
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -126,7 +126,7 @@ var a = {
   d: e,
 };
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -137,7 +137,7 @@ let a = function () {
   statement;
 }
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -150,7 +150,7 @@ let
   }
 statement;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -163,7 +163,7 @@ let a = {
   
   f=1, g, h;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -179,7 +179,7 @@ let a=[0,
     /^([^.]*)/
   ]
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 

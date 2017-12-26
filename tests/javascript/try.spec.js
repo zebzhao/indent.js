@@ -15,7 +15,7 @@ catch(e) {
   return {c: 1};
 }
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 });

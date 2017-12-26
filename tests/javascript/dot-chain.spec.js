@@ -29,7 +29,7 @@ a.test
 .0
 .1
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -38,7 +38,7 @@ a.test
 a.b('0')
   .d(1, 2, 3);
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -49,7 +49,7 @@ var a = b
   .d("1")
   .e("2", true);
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -59,7 +59,7 @@ a.b('').
   c.
   d;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 });

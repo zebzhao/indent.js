@@ -37,7 +37,7 @@ var indent = (function (root) {
    * as otherwise it will be matched first, and subsequent ones may be ignored
    * and skipped permanently by other rules.
    */
-  var masterRules = [
+  var MASTER_RULES = [
     {
       $languages: "html",
       $name: "comment",
@@ -135,7 +135,6 @@ var indent = (function (root) {
       $endPatterns: [function (string, rule, state) {
         var re = new RegExp("</" + state.openingTag + ">", "i");
         var match = string.match(re);
-        console.log(state.openingTag, match);
         if (match) {
           return {
             matchIndex: match.index,
@@ -393,60 +392,38 @@ var indent = (function (root) {
     }
   ];
 
-  var cssRules = filterRules('css', masterRules),
-      jsRules = filterRules('js', masterRules),
-      htmlRules = filterRules('html', masterRules);
-
-  var exports = {
-    css: function (code, tabString) {
-      return indent(code || '', cssRules, tabString === undefined ? '\t' : tabString);
+  return {
+    css: function (code, options) {
+      return indent(code, filterRules('css', MASTER_RULES, options), options);
     },
-    js: function (code, tabString) {
-      return indent(code || '', jsRules, tabString === undefined ? '\t' : tabString);
+    js: function (code, options) {
+      return indent(code, filterRules('js', MASTER_RULES, options), options);
     },
-    html: function (code, tabString) {
-      return indent(code || '', htmlRules, tabString === undefined ? '\t' : tabString);
+    ts: function (code, options) {
+      return indent(code, filterRules('js', MASTER_RULES, options), options);
     },
-    /**
-     * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use js instead.
-     */
-    indentJS: function (code, indentString) {
-      if (console && console.warn) console.warn("Calling deprecated function!");
-      return exports.js(code, indentString);
-    },
-    /**
-     * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use css instead.
-     */
-    indentCSS: function (code, indentString) {
-      if (console && console.warn) console.warn("Calling deprecated function!");
-      return exports.css(code, indentString);
-    },
-    /**
-     * @deprecated Since version 0.2.0. Will be deleted in version 0.3.0. Use html instead.
-     */
-    indentHTML: function (code, indentString) {
-      if (console && console.warn) console.warn("Calling deprecated function!");
-      return exports.html(code, indentString);
+    html: function (code, options) {
+      return indent(code, filterRules('html', MASTER_RULES, options), options);
     }
   };
 
-  return exports;
 
-
-  function indent(code, baseRules, indentation) {
+  function indent(code, baseRules, options) {
+    code = code || '';
     /**
      * Algorithm assumptions
      *
-     * indentDeltas - store the the deltas in indentation
-     *              - can be manipulated directly to alter the indentation
+     * indentDeltas - store the the deltas in tabString
+     *              - can be manipulated directly to alter the tabString
      * indentBuffer - used to keep tabs on the number of open indentations on each line
      * dedentBuffer - each line in the buffer has an array storing open indent lines to be closed
      *              - an array of numbers is used to reference the opening line
      *              - a negative number is used to signify a soft dedent (see note about soft dedent)
      *
-     * Each line can create at most 1 indentation.
+     * Each line can create at most 1 tabString.
      * When a line is 'used up' for dedent, it cannot be used again, hence the indentBuffer.
      */
+    var tabString = options.tabString === undefined ? '\t' : options.tabString;
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
     var ignoreBuffer = intArray(lineCount);
@@ -459,6 +436,15 @@ var indent = (function (root) {
     var matchEnd, matchStart;
     var modeRules = null;
     var line, lineToMatch, activeMatch;
+
+    options.debug = {
+      buffers: {
+        ignore: ignoreBuffer,
+        indent: indentBuffer,
+        dedent: dedentBuffer,
+        active: activeMatches
+      }
+    };
 
     while (l < lineCount) {
       line = lines[l].trim();
@@ -496,11 +482,6 @@ var indent = (function (root) {
       }
     }
 
-    console.log(dedentBuffer);
-    console.log(indentBuffer);
-    console.log(ignoreBuffer);
-    console.log(activeMatches);
-
     var
       hardIndentCount,
       dedentLines, dedentLine, dedents,
@@ -534,14 +515,11 @@ var indent = (function (root) {
     for (i=0; i<lineCount; i++) {
       if (ignoreBuffer[i] === 0) {
         indents += indentDeltas[i] || 0;
-        newLines.push((indents > 0 ? repeatString(indentation, indents) : '') + lines[i].trim());
+        newLines.push((indents > 0 ? repeatString(tabString, indents) : '') + lines[i].trim());
       } else {
         newLines.push(lines[i]);
       }
     }
-
-    console.log(hardIndents);
-    console.log(indentDeltas);
 
     return newLines.join('\r\n');
 
@@ -558,7 +536,7 @@ var indent = (function (root) {
         indentBuffer[line]++;
       }
       if (rule.$switchRules) {
-        modeRules = filterRules(rule.$switchRules);
+        modeRules = filterRules(rule.$switchRules, MASTER_RULES);
       }
       if (rule.$newScope) {
         lastMatches.push(null);
