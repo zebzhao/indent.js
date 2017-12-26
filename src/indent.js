@@ -56,18 +56,11 @@ var indent = (function (root) {
     },
     {
       $languages: "html",
-      $name: "html-tag",
-      $startPatterns: [/\<html/i],
-      $endPatterns: [/>/],
-      $ignoreRules: true,
-      $consumeEndMatch: true
-    },
-    {
-      $languages: "html",
       $name: "void-tags",
       $startPatterns: [
         /\<(area|base|br|col|command|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)/i],
       $endPatterns: [/>/],
+      $indent: true,
       $consumeEndMatch: true
     },
     {
@@ -118,16 +111,40 @@ var indent = (function (root) {
     },
     {
       $languages: "html",
-      $name: "tag-attr",
-      $startPatterns: [/<[A-Za-z0-9\-]+/],
-      $endPatterns: [/>/],
-      $indent: true
+      $name: "html-tag",
+      $startPatterns: [/<html[^A-Za-z0-9]/i],
+      $endPatterns: [/<\/html>/i],
+      $consumeEndMatch: true
     },
     {
       $languages: "html",
       $name: "tag",
-      $startPatterns: [/>/],
-      $endPatterns: [/<\/[A-Za-z0-9\-]+>/],
+      $startPatterns: [function (string, rule, state) {
+        var re = /<([A-Za-z0-9\-]+)/;
+        var match = string.match(re);
+        if (match) {
+          state.openingTag = match[1];
+          return {
+            matchIndex: match.index,
+            length: match[0].length
+          }
+        } else {
+          return null;
+        }
+      }],
+      $endPatterns: [function (string, rule, state) {
+        var re = new RegExp("</" + state.openingTag + ">", "i");
+        var match = string.match(re);
+        console.log(state.openingTag, match);
+        if (match) {
+          return {
+            matchIndex: match.index,
+            length: match[0].length
+          }
+        } else {
+          return null;
+        }
+      }],
       $indent: true,
       $consumeEndMatch: true
     },
@@ -193,13 +210,29 @@ var indent = (function (root) {
       $consumeEndMatch: true
     },
     {
-      $languages: "js css html",
+      $languages: "html",
+      $name: "quotes",
+      $startPatterns: [/"/],
+      $endPatterns: [/"/, NEW_LINE_REGEX],
+      $ignoreRules: true,
+      $consumeEndMatch: true
+    },
+    {
+      $languages: "html",
+      $name: "quotes",
+      $startPatterns: [/'/],
+      $endPatterns: [/'/, NEW_LINE_REGEX],
+      $ignoreRules: true,
+      $consumeEndMatch: true
+    },
+    {
+      $languages: "js css",
       $name: "string",
       $startPatterns: [/(''|""|``)/],
       $endPatterns: [/./, NEW_LINE_REGEX]
     },
     {
-      $languages: "js css html",
+      $languages: "js css",
       $name: "string",
       $startPatterns: [/\"(?=[^"])/],
       $endPatterns: [/[^\\]\"/, NEW_LINE_REGEX],
@@ -207,7 +240,7 @@ var indent = (function (root) {
       $consumeEndMatch: true
     },
     {
-      $languages: "js css html",
+      $languages: "js css",
       $name: "string",
       $startPatterns: [/\'(?=[^'])/],
       $endPatterns: [/[^\\]\'/, NEW_LINE_REGEX],
@@ -215,7 +248,7 @@ var indent = (function (root) {
       $consumeEndMatch: true
     },
     {
-      $languages: "js css html",
+      $languages: "js css",
       $name: "string",
       $startPatterns: [/\`(?=[^`])/],
       $endPatterns: [/[^\\]\`/],
@@ -584,8 +617,21 @@ var indent = (function (root) {
         relativeIndex: result ? minIndex : -1,
         matchIndex: result ? minIndex + index : -1,
         cursor: result ? index + minMatch.cursor : -1,
-        state: match.state,
+        state: minMatch ? minMatch.state : {},
         lastMatch: lastMatch
+      };
+    }
+
+    function matchEndRule(string, active, offset, matchStart) {
+      string = string.substr(offset, string.length);
+      var rule = active.rule;
+      var match = searchAny(string, rule.$endPatterns, rule, active.state, matchStart);
+      var cursor = rule.$consumeEndMatch ? match.cursor : match.matchIndex;
+      return {
+        endPatternIndex: match.endPatternIndex,
+        matchIndex: match.matchIndex === -1 ? -1 : match.matchIndex + offset,
+        cursor: cursor == -1 ? -1 : cursor + offset,
+        state: match.state
       };
     }
   }
@@ -636,19 +682,6 @@ var indent = (function (root) {
       }
     }
     return null;
-  }
-  
-  function matchEndRule(string, active, offset, matchStart) {
-    string = string.substr(offset, string.length);
-    var rule = active.rule;
-    var match = searchAny(string, rule.$endPatterns, rule, active.state, matchStart);
-    var cursor = rule.$consumeEndMatch ? match.cursor : match.matchIndex;
-    return {
-      endPatternIndex: match.endPatternIndex,
-      matchIndex: match.matchIndex === -1 ? -1 : match.matchIndex + offset,
-      cursor: cursor == -1 ? -1 : cursor + offset,
-      state: match.state
-    };
   }
 
   function searchAny(string, patterns, rule, state, matchStart) {
