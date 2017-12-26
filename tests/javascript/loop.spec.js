@@ -9,7 +9,7 @@ for (var a in b) c.push(d);
 for (var e,f; e<0
   ; e++) g.push(h);
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -21,7 +21,7 @@ for (var a in b)
   for (var c in d)
     c.push(d);
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -33,7 +33,7 @@ do {
   a !== ( a = b() / c ) && d !== 1 && --e
 );
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 });

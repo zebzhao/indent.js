@@ -10,7 +10,7 @@ var a = '',
   b = "",
   c =\`\`;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -23,7 +23,7 @@ var a = "\u0301-\u036f\u0483-\u0487\u0591",
 \u0483
 \`
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -36,7 +36,7 @@ var a = \`
 3
 \`
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -46,7 +46,7 @@ var a = '0\\'',
   b = "1\\"",
   c = \`2\\\`\`
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -58,7 +58,7 @@ var a = '"',
   d = \`"\`,
   e = \`'\`
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 

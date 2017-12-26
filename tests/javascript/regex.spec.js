@@ -9,7 +9,7 @@ describe('regex', function () {
 var a = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g,
   b;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -20,7 +20,7 @@ var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 var rtagName = ( /<([\w:-]+)/ );
 var rscriptType = ( /^$|\/(?:java|ecma)script/i );
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
@@ -29,7 +29,7 @@ var rscriptType = ( /^$|\/(?:java|ecma)script/i );
 var a = /[,=:!&|?};][\s]*\/[^/]|^\/[^/]/,
   b;
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 

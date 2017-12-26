@@ -13,7 +13,7 @@ describe('tag-attributes', function () {
   <script type="text/javascript" src="index.js"></script>
 </body>
 `;
-    expect(sut(expected, ts)).to.equal(
+    expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
 });
