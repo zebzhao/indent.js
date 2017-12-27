@@ -288,7 +288,7 @@ var indent = (function (root) {
       $languages: "js",
       $name: "dot-chain",
       $startPatterns: [/^\.[A-Za-z$_]/],
-      $endPatterns: [/[\.;]/],
+      $endPatterns: [/[\.;]/, NEW_LINE_REGEX],
       $indent: true,
       $matchBeginning: true,
       $lineOffset: -1

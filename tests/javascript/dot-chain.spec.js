@@ -62,4 +62,18 @@ a.b('').
     expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('dot without semicolon termination', function () {
+    var expected = `
+a = b.append("0")
+  .attr("1", width/2)
+
+function d(e) {
+  e
+    .attr("2", function(d) { return; })
+}
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 });
