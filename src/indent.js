@@ -15,6 +15,13 @@ var indent = (function (root) {
     return ret;
   }
 
+  // String.prototype.trim polyfill for IE9
+  if (!String.prototype.trim) {
+    String.prototype.trim = function () {
+      return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+  }
+
   var NEW_LINE_REGEX = /\r*\n/;
 
   /**
