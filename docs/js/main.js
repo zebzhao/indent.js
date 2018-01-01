@@ -53,8 +53,8 @@ fixScale = function(doc) {
 };
 
 var reformatCode = function() {
-  var indentChar = $('#indentWithSelect').val();
+  var tabString = $('#indentWithSelect').val();
   var indentMode = $('#indentMode').val();
-  indentChar = indentChar == '\\t' ? '\t' : indentChar;
-  $('#codeTextArea').val(indent[indentMode]($('#codeTextArea').val(), indentChar));
+  tabString = tabString == '\\t' ? '\t' : tabString;
+  $('#codeTextArea').val(indent[indentMode]($('#codeTextArea').val(), {tabString: tabString}));
 }
