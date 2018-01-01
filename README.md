@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/zebzhao/indent.js.svg?branch=master)](https://travis-ci.org/zebzhao/indent.js)
 
-Fast minimalistic pure indentation of JavaScript, CSS, and HTML.
+Fast minimalistic pure indentation of JavaScript (ES5, ES6, ES7), TypeScript, CSS, Less, Sass, and HTML.
+Indents better than most tools, test it out in the demo.
 
 [Online indent.js demo](https://zebzhao.github.io/indent.js/)
 
@@ -15,8 +16,9 @@ You have following options to get indent.js:
 
 ### Download
 
-* [Minified (~4 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
-* [Not minified (~11 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
+* [Minified and gzip (~2.7 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.min.js)
+* [Minified (~7 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.min.js)
+* [Not minified (~20 kB)](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
 
 Usage
 ---
@@ -39,17 +41,14 @@ define(['indent'] , function (indent) {
 ```javascript
 var indent = require('indent');
 // JS code
-var indented = indent.js(js, '  ');
+indent.js(code, {tabString: '  '});
+// TypeScript code
+indent.ts(code, {tabString: '\t'});
 // CSS code
-var indented = indent.css(css, '  ');
+indent.css(code);
 // HTML code
-var indented = indent.html(html, '  ');
-console.log(indented);
+indent.html(code, {tabString: '    '});
 ```
-
----
-
-This project is great for code editors and file watchers. I'd love to hear about how your projects use indent.js.
 
 Developers
 ---
@@ -57,10 +56,12 @@ Developers
 The rules this library uses are very simple and work on most languages with syntax using (), {}, etc...
 The languages below have not been fully tested and may fail to indent properly for some special cases.
 
-###Languages still not fully supported:
+###Languages supported
 
-1. TypeScript (partial?)
-2. Less/Sass (partial?)
+1. JavaScript/TypeScript
+2. HTML
+3. JSX (Partial support)
+4. CSS/Less/Sass
 
 ###Getting the project
 

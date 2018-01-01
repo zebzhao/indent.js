@@ -76,4 +76,16 @@ function d(e) {
     expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('dot chain inside iife function', function () {
+    var expected = `
+(function () {
+  statement().
+    a().
+    b()
+})()
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 });

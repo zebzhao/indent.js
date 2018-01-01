@@ -306,7 +306,7 @@ var indent = (function (root) {
       $languages: "js",
       $name: "dot-chain",
       $startPatterns: [/\.\s*\r*\n/],
-      $endPatterns: [/[\.;]/, /[^\s]\s*\r*\n/],
+      $endPatterns: [/[\.;})\]]/, /[^\s]\s*\r*\n/],
       $indent: true
     },
     {
