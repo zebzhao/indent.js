@@ -6,14 +6,22 @@
   <title>indent.js</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/github-dark.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.33.0/codemirror.min.css">
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/indent.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
+
   <!--[if lt IE 9]>
   <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+  <style>
+    .ace_editor {
+      height: 300px;
+    }
+  </style>
 </head>
 <body>
 
@@ -43,10 +51,11 @@
       <a id="a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" class="anchor"
          href="#a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" aria-hidden="true"><span
           aria-hidden="true" class="octicon octicon-link"></span></a>
-      A code indenter built to only indent code while preserving everything else.</h3>
+      A code indenter built to only indent code while preserving everything else.
+      Pure indentation, no funny business, unopinionated indentation library. Handles edge cases like a breeze!</h3>
 
     <p>This tool will not output proper js-lint compatible code (like forcing object properties to be on separate
-      lines). It works with any combination of CSS, JavaScript, HTML, and perhaps even several other languages.</p>
+      lines). It works with any combination of TypeScript, JavaScript, CSS, Sass, Less, HTML, and perhaps even several other languages.</p>
     <table>
       <tr>
         <td>
@@ -58,12 +67,6 @@
             <option value="  ">2 Spaces</option>
             <option value="   ">3 Spaces</option>
             <option value="    ">4 Spaces</option>
-            <option value="     ">5 Spaces</option>
-            <option value="      ">6 Spaces</option>
-            <option value="       ">7 Spaces</option>
-            <option value="        ">8 Spaces</option>
-            <option value="         ">9 Spaces</option>
-            <option value="          ">10 Spaces</option>
           </select>
         </td>
         <td>
@@ -80,13 +83,13 @@
       </tr>
     </table>
 
-<textarea id="codeTextArea" rows="20" style="width:100%;" wrap="off">
+<textarea id="codeTextArea" rows="20" style="width:100%; height:100%" wrap="off">
 // Destructuring
 var {a, b} = c
-var {
+var [
   a,
   b
-} = c
+] = c
 
 // Dot-chaining
 var a = b.c("0")
@@ -97,8 +100,7 @@ var a = b.c("0")
   })  // No semicolons!
 
 // Single line statements
-if (a)
-  statement;
+if (a) statement;
 else if (b)
   statement
 else
@@ -151,6 +153,7 @@ let a {
 </div>
 <!--[if !IE]>
 <script>fixScale(document);</script><![endif]-->
+<script src="js/main.js"></script>
 
 </body>
 </html>
