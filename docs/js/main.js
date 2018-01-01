@@ -56,5 +56,9 @@ var reformatCode = function() {
   var tabString = $('#indentWithSelect').val();
   var indentMode = $('#indentMode').val();
   tabString = tabString == '\\t' ? '\t' : tabString;
-  $('#codeTextArea').val(indent[indentMode]($('#codeTextArea').val(), {tabString: tabString}));
+  editor.setValue(indent[indentMode](editor.getValue(), {tabString: tabString}));
 }
+
+var editor = ace.edit("codeTextArea");
+editor.setTheme("ace/theme/github");
+editor.getSession().setMode("ace/mode/jsx");

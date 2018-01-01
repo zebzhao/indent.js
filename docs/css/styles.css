@@ -295,7 +295,7 @@ ul {
 }
 
 dd {
-  margin: 0 0 0 40px;
+  margin: 0 0 0 20px;
 }
 
 /*
@@ -304,7 +304,7 @@ dd {
 menu,
 ol,
 ul {
-  padding: 0 0 0 40px;
+  padding: 0 0 0 20px;
 }
 
 /*
@@ -512,7 +512,6 @@ body {
   color: #666;
   font-weight: 300;
   margin: 0px;
-  padding: 0px 0 20px 0px;
   background: url(../img/body-background.png) #eae6d1;
 }
 
@@ -582,7 +581,6 @@ section img {
 blockquote {
   border-left: 1px solid #ffcc00;
   margin: 0;
-  padding: 0 0 0 20px;
   font-style: italic;
 }
 
@@ -603,7 +601,6 @@ code {
 }
 
 pre {
-  padding: 8px 15px;
   background: #333333;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
@@ -617,7 +614,6 @@ pre {
 }
 pre code {
   margin: 0px;
-  padding: 0px;
 }
 
 table {
@@ -656,7 +652,7 @@ dt {
 }
 
 header {
-  padding: 20px 20px 20px 20px;
+  padding: 10px;
   margin: 0;
   position: fixed;
   top: 0;
@@ -785,7 +781,7 @@ header p {
 
 section {
   width: 590px;
-  padding: 30px 30px 50px 30px;
+  padding: 10px;
   margin: 85px 0 50px;
   position: relative;
   background: #fbfbfb;
