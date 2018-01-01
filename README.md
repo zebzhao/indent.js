@@ -56,14 +56,14 @@ Developers
 The rules this library uses are very simple and work on most languages with syntax using (), {}, etc...
 The languages below have not been fully tested and may fail to indent properly for some special cases.
 
-###Languages supported
+### Languages supported
 
 1. JavaScript/TypeScript
 2. HTML
 3. JSX (Partial support)
 4. CSS/Less/Sass
 
-###Getting the project
+### Getting the project
 
 1. Run `npm install` to install dependencies
 2. Run `npm test` to run tests in `tests` folder
