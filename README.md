@@ -4,9 +4,9 @@
 
 Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying of your code, leave it as it is, only correctly indents it following some basic rules.
 
-[Online indent.js demo](https://zebzhao.github.io/indent.js/)
+*If you like this project please leave a star. Your support is greatly appreciated.*
 
----
+[Online indent.js demo](https://zebzhao.github.io/indent.js/)
 
 You have following options to get indent.js:
 
@@ -20,32 +20,29 @@ You have following options to get indent.js:
 
 
 ## Usage
----
 
-### Browser Global
+Browser Global
 ```javascript
-var indented = indent.indentJS(code, '\t');
+var indented = indent.js(code, '\t');
 console.log(indented);
 ```
 
-### Browser using AMD
+Browser using AMD
 ```javascript
 define(['indent'] , function (indent) {
-    var indented = indent.indentJS(code, '\t');
+    var indented = indent.js(code, '\t');
     console.log(indented);
 });
 ```
 
-### Node
+Node/CommonJS
 ```javascript
 var indent = require('indent');
-var indented = indent.indentJS(code, '  ');
+var indented = indent.js(code, '  ');
 console.log(indented);
 ```
 
-*If you like this project please leave a star. Your support is greatly appreciated.*
-
-## Projects with indent.js:
+## Projects using indent.js:
 
 1. [Spck.io - An offline web editor that keeps your data private](https://spck.io/)
 
