@@ -42,7 +42,7 @@ function indentCode() {
 }
 
 var mode;
-var origin = 'http://localhost:8123';
+var origin = 'https://spck.io';
 var editorWindow = document.getElementById('editor').contentWindow;
 var tabSize = '2';
 
@@ -143,7 +143,7 @@ for (var id in EXAMPLES) {
 function init() {
   setTimeout(function () {
     changeExample('jsx:class');
-  }, 1500);
+  }, 1800);
 }
 
 function multiline(f) {
