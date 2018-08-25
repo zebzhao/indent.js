@@ -3,169 +3,177 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>indent.js</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <script src="javascripts/indent.min.js"></script>
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <title>indent.js - pure code indenter</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+    <style>
+        body {
+          margin: 0;
+          font-size: 14px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        
+        p, li {
+          line-height: 24px;
+        }
+        
+        .container {
+          max-width: 700px;
+          box-sizing: border-box;
+          padding: 36px;
+          margin: 0 auto;
+        }
+        
+        h1 {
+          margin: 0;
+        }
+        
+        h1, h2, h3, h4, h5 {
+          font-weight: 200;
+        }
+        
+        h2, h5 {
+          border-bottom: solid 1px lightcoral;
+        }
+        
+        h1, h2, h5 {
+          padding: 12px 0;
+        }
+        
+        h3, h4 {
+          margin-bottom: 0;
+        }
+        
+        h5 {
+          margin: 0 0 30px;
+        }
+        
+        h5 {
+          font-size: 12px;
+          text-transform: uppercase;
+          color: #333;
+        }
+
+        h5 a {
+          text-decoration: none;
+        }
+        
+        a {
+          color: darkslategray;
+        }
+        
+        strong {
+          font-weight: 500;
+        }
+
+        select {
+            border: 0 none;
+            padding: 0 10px;
+            margin: 0 12px;
+            background: #fff;
+            color: #666;
+            border: 1px solid #e5e5e5;
+            transition: .2s ease-in-out;
+            transition-property: color,background-color,border;
+
+            height: 36px;
+            vertical-align: middle;
+            display: inline-block;
+
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 20px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%201%209%206%2015%206%22%20%2F%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%2013%209%208%2015%208%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
+            background-repeat: no-repeat;
+            background-position: 100% 50%;
+        }
+
+        button:hover {
+            background-color: transparent;
+            color: #222;
+            border-color: #b2b2b2
+        }
+
+        button {
+            background-color: transparent;
+            color: #222;
+            border: 1px solid #e5e5e5;
+
+            margin: 0;
+            outline: none;
+            overflow: visible;
+            font: inherit;
+            display: inline-block;
+            box-sizing: border-box;
+            padding: 0 24px;
+            vertical-align: middle;
+            font-size: 14px;
+            line-height: 32px;
+            max-height: 32px;
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: .1s ease-in-out;
+            transition-property: color,background-color,border-color
+        }
+
+        .space-between {
+            display: flex;
+            justify-content: space-between;
+            margin: 24px 0 0;
+        }
+    </style>
 </head>
-<body>
 
-<header>
+<body class="container">
+
     <h1>indent.js</h1>
-</header>
+    <h5><a href="https://github.com/zebzhao/indent.js">View On GitHub</a></h5>
 
-<div id="banner">
-    <span id="logo"></span>
+    <p>
+        Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying of your code, leave it as it is, only correctly indents it following some basic rules.
+    </p>
 
-    <a href="https://github.com/zebzhao/indent.js" class="button fork"><strong>View On GitHub</strong></a>
-    <!--<div class="downloads">-->
-        <!--<span>Downloads:</span>-->
-        <!--<ul>-->
-            <!--<li><a href="https://github.com/zebzhao/indent.js/zipball/master" class="button">ZIP</a></li>-->
-            <!--<li><a href="https://github.com/zebzhao/indent.js/tarball/master" class="button">TAR</a></li>-->
-        <!--</ul>-->
-    <!--</div>-->
-</div><!-- end banner -->
+    <p class="space-between">
+        <label>
+            Example
+            <select onchange="changeExample(this.options[this.selectedIndex].value)">
+                <optgroup label="JSX">
+                    <option value="jsx:class">JSX Class</option>
+                </optgroup>
+                <optgroup label="TSX">
+                    <option value="tsx:class">TSX Class</option>
+                </optgroup>
+                <optgroup label="HTML">
+                    <option value="html:">HTML</option>
+                </optgroup>
+                <optgroup label="SCSS">
+                    <option value="scss:">SCSS</option>
+                </optgroup>
+                <optgroup label="LESS">
+                    <option value="less:">LESS</option>
+                </optgroup>
+            </select>
+        </label>
 
-<div class="wrapper">
-    <nav>
-        <ul></ul>
-    </nav>
-    <section>
-        <h3>
-            <a id="a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" class="anchor" href="#a-code-indenter-built-to-only-indent-code-while-preserving-everything-else" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>
-            A code indenter built to only indent code while preserving everything else.</h3>
+        <label>
+            &nbsp;
+            <button onclick="indentCode()">Indent</button>
+        </label>
 
-        <p>This tool will not output proper js-lint compatible code (like forcing object properties to be on separate lines). It works with any combination of CSS, JavaScript, HTML, and perhaps even several other languages.</p>
-        <table>
-            <tr>
-                <td>
-                    <label>Indent with</label>
-                    <select id="indentWithSelect">
-                        <option value="\t" selected="selected">Tab</option>
-                        <option value="">0 Spaces</option>
-                        <option value=" ">1 Space</option>
-                        <option value="  ">2 Spaces</option>
-                        <option value="   ">3 Spaces</option>
-                        <option value="    ">4 Spaces</option>
-                        <option value="     ">5 Spaces</option>
-                        <option value="      ">6 Spaces</option>
-                        <option value="       ">7 Spaces</option>
-                        <option value="        ">8 Spaces</option>
-                        <option value="         ">9 Spaces</option>
-                        <option value="          ">10 Spaces</option>
-                    </select>
-                </td>
-                <td>
-                    <button style="width:100%;min-height:35px" onclick="reformatCode()">Reindent Code</button>
-                </td>
-            </tr>
-        </table>
-        <textarea id="codeTextArea" rows="20" style="width:100%;" wrap="off">
-/**
-Code taken from js-beautify project
-*/
-function handle_start_block() {
-// Check if this is should be treated as a ObjectLiteral
-var next_token = get_token(1);
-var second_token = get_token(2);
-if (second_token && (
-(in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) ||
-(in_array(next_token.text, ['get', 'set']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
-)) {
-// We don't support TypeScript,but we didn't break it for a very long time.
-// We'll try to keep not breaking it.
-if (!in_array(last_last_text, ['class', 'interface'])) {
-set_mode(MODE.ObjectLiteral);
-} else {
-set_mode(MODE.BlockStatement);
-}
-} else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
-// arrow function: (param1, paramN) => { statements }
-set_mode(MODE.BlockStatement);
-} else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
-(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import', 'default']))
-) {
-// Detecting shorthand function syntax is difficult by scanning forward,
-//     so check the surrounding context.
-// If the block is being returned, imported, export default, passed as arg,
-//     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
-set_mode(MODE.ObjectLiteral);
-} else {
-set_mode(MODE.BlockStatement);
-}
+        <label>
+            Tab Size
+            <select onchange="changeTabSize(this.options[this.selectedIndex].value)">
+                <option value="2" selected>2</option>
+                <option value="4">4</option>
+                <option value="tab">Tab</option>
+            </select>
+        </label>
+    </p>
+    
+    <iframe id="editor" src="http://localhost:8123/embed" frameBorder="0" width="100%" height="360">Browser not compatible.</iframe>
 
-var empty_braces = !next_token.comments_before.length && next_token.text === '}';
-var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
-last_type === 'TK_END_EXPR';
-
-
-if (opt.brace_style === "expand" ||
-(opt.brace_style === "none" && current_token.wanted_newline)) {
-if (last_type !== 'TK_OPERATOR' &&
-(empty_anonymous_function ||
-last_type === 'TK_EQUALS' ||
-(last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
-output.space_before_token = true;
-} else {
-print_newline(false, true);
-}
-} else { // collapse
-if (opt.brace_style === 'collapse-preserve-inline') {
-// search forward for a newline wanted inside this block
-var index = 0;
-var check_token = null;
-flags.inline_frame = true;
-do {
-index += 1;
-check_token = get_token(index);
-if (check_token.wanted_newline) {
-    flags.inline_frame = false;
-    break;
-}
-} while (check_token.type !== 'TK_EOF' &&
-!(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token));
-}
-
-if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
-// if we're preserving inline,
-// allow newline between comma and next brace.
-if (last_type === 'TK_COMMA' || opt.space_in_paren) {
-output.space_before_token = true;
-}
-
-if (opt.brace_style === 'collapse-preserve-inline' &&
-(last_type === 'TK_COMMA' || (last_type === 'TK_START_EXPR' && flags.inline_frame))) {
-allow_wrap_or_preserved_newline();
-previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
-flags.multiline_frame = false;
-}
-} else if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
-if (last_type === 'TK_START_BLOCK') {
-print_newline();
-} else {
-output.space_before_token = true;
-}
-}
-}
-print_token();
-indent();
-}</textarea>
-
-    </section>
-    <footer>
-        <p>Project maintained by <a href="https://github.com/zebzhao">zebzhao</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
-    </footer>
-</div>
-<!--[if !IE]><script>fixScale(document);</script><![endif]-->
-
+    <script src="js/indent.min.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
