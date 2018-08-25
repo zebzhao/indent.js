@@ -25,7 +25,7 @@ gulp.task('build-minify', function (cb) {
 });
 
 gulp.task('build-docs', function (cb) {
-  return gulp.src(['src/**/*.js'])
+  return gulp.src(['lib/**/*.min.js'])
     .pipe(gulp.dest('./docs/js'))
 });
 
