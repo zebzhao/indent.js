@@ -5,3 +5,4 @@ coverage
 bower_components
 .idea
 .vscode
+package-lock.json

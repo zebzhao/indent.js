@@ -168,7 +168,8 @@ var indent = (function (root) {
       $name: "block-comment",
       $startPatterns: [/\/\*/],
       $endPatterns: [/\*\//],
-      $ignoreRules: true
+      $ignoreRules: true,
+      $consumeEndMatch: true
     },
     {
       $languages: "js",
@@ -313,7 +314,7 @@ var indent = (function (root) {
       $languages: "js css",
       $name: "array",
       $startPatterns: [/\[/],
-      $endPatterns: [/]/],
+      $endPatterns: [/\]/],
       $indent: true,
       $consumeEndMatch: true,
       $newScope: true
@@ -322,7 +323,7 @@ var indent = (function (root) {
       $languages: "js css",
       $name: "block",
       $startPatterns: [/\{/],
-      $endPatterns: [/}/],
+      $endPatterns: [/\}/],
       $indent: true,
       $consumeEndMatch: true,
       $newScope: true
