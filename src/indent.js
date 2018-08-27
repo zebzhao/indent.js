@@ -525,11 +525,11 @@ var indent = (function (root) {
     }
 
     for (i=0; i<lineCount; i++) {
-      if (ignoreBuffer[i] === 0) {
+      if (ignoreBuffer[i-1] === 1 && ignoreBuffer[i] === 1) {
+        newLines.push(lines[i]);
+      } else {
         indents += indentDeltas[i] || 0;
         newLines.push((indents > 0 ? repeatString(tabString, indents) : '') + lines[i].trim());
-      } else {
-        newLines.push(lines[i]);
       }
     }
 
