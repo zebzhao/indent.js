@@ -1,46 +1,3 @@
-function changeExample(id) {
-  mode = id.split(':')[0];
-  editorWindow.postMessage({
-    text: EXAMPLES[id],
-    mode: mode
-  }, origin);
-}
-
-function changeTabSize(size) {
-  var tabSizeMap = {
-    '2': 2,
-    '4': 4,
-    'tab': 4
-  };
-  tabSize = size;
-  editorWindow.postMessage({
-    tabSize: tabSizeMap[size]
-  }, origin);
-}
-
-function indentCode() {
-  var channel = new MessageChannel();
-  channel.port1.onmessage = function (e) {
-    var modeMap = {
-      'less': 'css',
-      'scss': 'css',
-      'css': 'css',
-      'tsx': 'ts',
-      'jsx': 'js',
-      'html': 'html'
-    };
-    var tabStringMap = {
-      '2': '  ',
-      '4': '    ',
-      'tab': '\t'
-    };
-    editorWindow.postMessage({
-      text: indent[modeMap[mode]](e.data, {tabString: tabStringMap[tabSize]})
-    }, origin);
-  };  
-  editorWindow.postMessage('text', origin, [channel.port2]);
-}
-
 var mode;
 var origin = 'https://spck.io';
 var editorWindow = document.getElementById('editor').contentWindow;
@@ -140,10 +97,38 @@ for (var id in EXAMPLES) {
   if (EXAMPLES.hasOwnProperty(id)) EXAMPLES[id] = multiline(EXAMPLES[id]);
 }
 
+function establishConnection (maxTries) {
+  return new Promise(function (resolve, reject) {
+    var tries = 0;
+    var intervalId = setInterval(function () {
+      if (tries >= maxTries) {
+        clearInterval(intervalId);
+        reject('Connection to iframe window failed: maximum tries exceeded.')
+        return;
+      }
+      else {
+        tries++;
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function (e) {
+          if (e.data == 'connected') {
+            clearInterval(intervalId);
+            resolve(tries);
+          }
+        };
+
+        try {
+          editorWindow.postMessage('connect', origin, [channel.port2]);
+        }
+        catch (e) {}
+      }
+    }, 500);
+  });
+}
+
 function init() {
-  setTimeout(function () {
+  establishConnection(10).then(function () {
     changeExample('jsx:class');
-  }, 1800);
+  });
 }
 
 function multiline(f) {
@@ -151,4 +136,47 @@ function multiline(f) {
     .replace(/^[^\/]+\/\*[\s\n\r]*/, '')
     .replace(/\*\/[^\/]+$/, '')
     .replace(/[\r]?\n/gi, '\r\n');
+}
+
+function changeExample(id) {
+  mode = id.split(':')[0];
+  editorWindow.postMessage({
+    text: EXAMPLES[id],
+    mode: mode
+  }, origin);
+}
+
+function changeTabSize(size) {
+  var tabSizeMap = {
+    '2': 2,
+    '4': 4,
+    'tab': 4
+  };
+  tabSize = size;
+  editorWindow.postMessage({
+    tabSize: tabSizeMap[size]
+  }, origin);
+}
+
+function indentCode() {
+  var channel = new MessageChannel();
+  channel.port1.onmessage = function (e) {
+    var modeMap = {
+      'less': 'css',
+      'scss': 'css',
+      'css': 'css',
+      'tsx': 'ts',
+      'jsx': 'js',
+      'html': 'html'
+    };
+    var tabStringMap = {
+      '2': '  ',
+      '4': '    ',
+      'tab': '\t'
+    };
+    editorWindow.postMessage({
+      text: indent[modeMap[mode]](e.data, {tabString: tabStringMap[tabSize]})
+    }, origin);
+  };  
+  editorWindow.postMessage('text', origin, [channel.port2]);
 }
