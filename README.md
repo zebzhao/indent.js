@@ -42,9 +42,19 @@ var indented = indent.js(code, '  ');
 console.log(indented);
 ```
 
+ES6/ES2015 Modules
+```javascript
+import {indent} from 'indent.js';
+
+var indentedJs = indent.js(code, '\t');  // JSX as well
+var indentedTs = indent.ts(code, '\t');  // TSX as well
+var indentedCss = indent.css(code, '\t');
+var indentedHtml = indent.html(code, '\t');
+```
+
 ## Projects using indent.js:
 
-1. [Spck.io - An offline web editor that keeps your data private](https://spck.io/)
+1. [Spck.io - Private code editor for the web](https://spck.io/)
 
 
 ## Languages still not supported:
@@ -54,6 +64,7 @@ console.log(indented);
 
 ## Getting the project
 
-1. Run `npm install` to install dependencies
-2. Run `npm test` to run tests in `tests` folder
-3. Run `npm run build` to build the project
+1. Clone the repo.
+2. Run `npm install` to install dependencies
+3. Run `npm test` to run tests in `tests` folder
+4. Run `npm run build` to build the project

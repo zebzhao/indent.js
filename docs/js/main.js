@@ -1,6 +1,6 @@
 var mode;
 var origin = 'https://spck.io';
-var editorWindow = document.getElementById('editor').contentWindow;
+var editor = new SpckEditor('#editor');
 var tabSize = '2';
 
 var EXAMPLES = {
@@ -97,36 +97,8 @@ for (var id in EXAMPLES) {
   if (EXAMPLES.hasOwnProperty(id)) EXAMPLES[id] = multiline(EXAMPLES[id]);
 }
 
-function establishConnection (maxTries) {
-  return new Promise(function (resolve, reject) {
-    var tries = 0;
-    var intervalId = setInterval(function () {
-      if (tries >= maxTries) {
-        clearInterval(intervalId);
-        reject('Connection to iframe window failed: maximum tries exceeded.')
-        return;
-      }
-      else {
-        tries++;
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function (e) {
-          if (e.data == 'connected') {
-            clearInterval(intervalId);
-            resolve(tries);
-          }
-        };
-
-        try {
-          editorWindow.postMessage('connect', origin, [channel.port2]);
-        }
-        catch (e) {}
-      }
-    }, 500);
-  });
-}
-
 function init() {
-  establishConnection(10).then(function () {
+  editor.connect(function () {
     changeExample('jsx:class');
   });
 }
@@ -140,7 +112,7 @@ function multiline(f) {
 
 function changeExample(id) {
   mode = id.split(':')[0];
-  editorWindow.postMessage({
+  editor.configure({
     text: EXAMPLES[id],
     mode: mode
   }, origin);
@@ -153,14 +125,13 @@ function changeTabSize(size) {
     'tab': 4
   };
   tabSize = size;
-  editorWindow.postMessage({
+  editor.configure({
     tabSize: tabSizeMap[size]
   }, origin);
 }
 
 function indentCode() {
-  var channel = new MessageChannel();
-  channel.port1.onmessage = function (e) {
+  editor.getText(function (e) {
     var modeMap = {
       'less': 'css',
       'scss': 'css',
@@ -174,9 +145,8 @@ function indentCode() {
       '4': '    ',
       'tab': '\t'
     };
-    editorWindow.postMessage({
+    editor.configure({
       text: indent[modeMap[mode]](e.data, {tabString: tabStringMap[tabSize]})
     }, origin);
-  };  
-  editorWindow.postMessage('text', origin, [channel.port2]);
+  });
 }

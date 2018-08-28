@@ -1,8 +1,9 @@
 {
   "name": "indent.js",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Fast minimalistic pure indentation of JavaScript, CSS, and HTML.",
   "main": "lib/indent.js",
+  "module": "lib/index.js",
   "directories": {
     "test": "tests",
     "lib": "lib",
@@ -15,7 +16,8 @@
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^1.4.1",
     "gulp-umd": "^0.2.0",
-    "mocha": "^4.0.1"
+    "mocha": "^4.0.1",
+    "pump": "^3.0.0"
   },
   "scripts": {
     "build": "gulp build",

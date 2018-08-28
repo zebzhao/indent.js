@@ -1,6 +1,7 @@
 {
   "name": "indent.js",
-  "version": "0.3.1",
+  "version": "0.3.2",
+  "description": "Fast, non-restrictive code formatting alternative to js-beautifier.",
   "homepage": "https://github.com/zebzhao/indent.js",
   "main": "lib/indent.js",
   "dependencies": {},
@@ -9,11 +10,9 @@
     "node_modules",
     "gulpfile.js",
     "karma.conf.js",
-    "package.json",
     "tests",
     "tools",
     "docs",
-    "bower.json",
     ".gitignore",
     ".travis.yml"
   ]
