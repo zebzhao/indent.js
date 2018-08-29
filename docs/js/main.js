@@ -1,5 +1,4 @@
 var mode;
-var origin = 'https://spck.io';
 var editor = new SpckEditor('#editor');
 var tabSize = '2';
 
@@ -115,7 +114,7 @@ function changeExample(id) {
   editor.configure({
     text: EXAMPLES[id],
     mode: mode
-  }, origin);
+  });
 }
 
 function changeTabSize(size) {
@@ -127,7 +126,7 @@ function changeTabSize(size) {
   tabSize = size;
   editor.configure({
     tabSize: tabSizeMap[size]
-  }, origin);
+  });
 }
 
 function indentCode() {
@@ -147,6 +146,6 @@ function indentCode() {
     };
     editor.configure({
       text: indent[modeMap[mode]](e.data, {tabString: tabStringMap[tabSize]})
-    }, origin);
+    });
   });
 }
