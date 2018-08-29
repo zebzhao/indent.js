@@ -413,7 +413,7 @@ var indent = (function (root) {
       return indent(code, filterRules('js', MASTER_RULES), options);
     },
     html: function (code, options) {
-      var rules = options.indentHtmlTag ?
+      var rules = options && options.indentHtmlTag ?
         filterRules('html', MASTER_RULES, 'html-tag') : filterRules('html', MASTER_RULES);
       return indent(code, rules, options);
     }
@@ -435,7 +435,7 @@ var indent = (function (root) {
      * Each line can create at most 1 tabString.
      * When a line is 'used up' for dedent, it cannot be used again, hence the indentBuffer.
      */
-    var tabString = options.tabString === undefined ? '\t' : options.tabString;
+    var tabString = options && options.tabString != null ? options.tabString : '\t';
     var lines = code.split(/[\r]?\n/gi);
     var lineCount = lines.length;
     var ignoreBuffer = intArray(lineCount);
@@ -449,14 +449,16 @@ var indent = (function (root) {
     var modeRules = null;
     var line, lineToMatch, activeMatch;
 
-    options.debug = {
-      buffers: {
-        ignore: ignoreBuffer,
-        indent: indentBuffer,
-        dedent: dedentBuffer,
-        active: activeMatches
-      }
-    };
+    if (options) {
+      options.debug = {
+        buffers: {
+          ignore: ignoreBuffer,
+          indent: indentBuffer,
+          dedent: dedentBuffer,
+          active: activeMatches
+        }
+      };
+    }
 
     while (l < lineCount) {
       line = lines[l].trim();

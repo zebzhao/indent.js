@@ -23,14 +23,14 @@ You have following options to get indent.js:
 
 Browser Global
 ```javascript
-var indented = indent.js(code, '\t');
+var indented = indent.js(code, {tabString: '\t'});
 console.log(indented);
 ```
 
 Browser using AMD
 ```javascript
 define(['indent'] , function (indent) {
-    var indented = indent.js(code, '\t');
+    var indented = indent.js(code, {tabString: '\t'});
     console.log(indented);
 });
 ```
@@ -38,7 +38,7 @@ define(['indent'] , function (indent) {
 Node/CommonJS
 ```javascript
 var indent = require('indent');
-var indented = indent.js(code, '  ');
+var indented = indent.js(code, {tabString: '  '});
 console.log(indented);
 ```
 
@@ -46,10 +46,10 @@ ES6/ES2015 Modules
 ```javascript
 import {indent} from 'indent.js';
 
-var indentedJs = indent.js(code, '\t');  // JSX as well
-var indentedTs = indent.ts(code, '\t');  // TSX as well
-var indentedCss = indent.css(code, '\t');
-var indentedHtml = indent.html(code, '\t');
+var indentedJs = indent.js(code, {tabString: '\t'});  // JSX as well
+var indentedTs = indent.ts(code, {tabString: '\t'});  // TSX as well
+var indentedCss = indent.css(code, {tabString: '\t'});
+var indentedHtml = indent.html(code, {tabString: '\t'});
 ```
 
 ## Projects using indent.js:
