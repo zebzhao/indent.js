@@ -1,181 +1,196 @@
 <!doctype html>
 <html>
+
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>indent.js - pure code indenter</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>indent.js - pure code indenter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <style>
-        body {
-          margin: 0;
-          font-size: 14px;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-        }
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124804584-2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-        p, li {
-          line-height: 24px;
-        }
+    gtag('config', 'UA-124804584-2');
+  </script>
 
-        .container {
-          max-width: 700px;
-          box-sizing: border-box;
-          padding: 36px;
-          margin: 0 auto;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
 
-        h1 {
-          margin: 0;
-        }
+    p, li {
+      line-height: 24px;
+    }
 
-        h1, h2, h3, h4, h5 {
-          font-weight: 200;
-        }
+    .container {
+      max-width: 700px;
+      box-sizing: border-box;
+      padding: 36px;
+      margin: 0 auto;
+    }
 
-        h2, h5 {
-          border-bottom: solid 1px lightcoral;
-        }
+    h1 {
+      margin: 0;
+    }
 
-        h1, h2, h5 {
-          padding: 12px 0;
-        }
+    h1, h2, h3, h4, h5 {
+      font-weight: 200;
+    }
 
-        h3, h4 {
-          margin-bottom: 0;
-        }
+    h2, h5 {
+      border-bottom: solid 1px lightcoral;
+    }
 
-        h5 {
-          margin: 0 0 30px;
-        }
+    h1, h2, h5 {
+      padding: 12px 0;
+    }
 
-        h5 {
-          font-size: 12px;
-          text-transform: uppercase;
-          color: #333;
-        }
+    h3, h4 {
+      margin-bottom: 0;
+    }
 
-        h5 a {
-          text-decoration: none;
-        }
+    h5 {
+      margin: 0 0 30px;
+    }
 
-        a {
-          color: darkslategray;
-        }
+    h5 {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #333;
+    }
 
-        strong {
-          font-weight: 500;
-        }
+    h5 a {
+      text-decoration: none;
+    }
 
-        select {
-            outline: none;
-            border: 0 none;
-            padding: 0 10px;
-            margin: 0 12px;
-            background: #fff;
-            color: #666;
-            border: 1px solid #e5e5e5;
-            transition: .2s ease-in-out;
-            transition-property: color,background-color,border;
+    a {
+      color: darkslategray;
+    }
 
-            height: 36px;
-            vertical-align: middle;
-            display: inline-block;
+    strong {
+      font-weight: 500;
+    }
 
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 20px;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%201%209%206%2015%206%22%20%2F%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%2013%209%208%2015%208%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
-            background-repeat: no-repeat;
-            background-position: 100% 50%;
-        }
+    select {
+      outline: none;
+      border: 0 none;
+      padding: 0 10px;
+      margin: 0 12px;
+      background: #fff;
+      color: #666;
+      border: 1px solid #e5e5e5;
+      transition: .2s ease-in-out;
+      transition-property: color, background-color, border;
 
-        button:hover {
-            background-color: transparent;
-            color: #222;
-            border-color: #b2b2b2
-        }
+      height: 36px;
+      vertical-align: middle;
+      display: inline-block;
 
-        button {
-            background-color: transparent;
-            color: #222;
-            border: 1px solid #e5e5e5;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 20px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%201%209%206%2015%206%22%20%2F%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%2013%209%208%2015%208%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
+      background-repeat: no-repeat;
+      background-position: 100% 50%;
+    }
 
-            margin: 0;
-            outline: none;
-            overflow: visible;
-            font: inherit;
-            display: inline-block;
-            box-sizing: border-box;
-            padding: 0 24px;
-            vertical-align: middle;
-            font-size: 14px;
-            line-height: 32px;
-            max-height: 32px;
-            text-align: center;
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: .1s ease-in-out;
-            transition-property: color,background-color,border-color
-        }
+    button:hover {
+      background-color: transparent;
+      color: #222;
+      border-color: #b2b2b2
+    }
 
-        .space-between {
-            display: flex;
-            justify-content: space-between;
-            margin: 24px 0 0;
-        }
-    </style>
+    button {
+      background-color: transparent;
+      color: #222;
+      border: 1px solid #e5e5e5;
+
+      margin: 0;
+      outline: none;
+      overflow: visible;
+      font: inherit;
+      display: inline-block;
+      box-sizing: border-box;
+      padding: 0 24px;
+      vertical-align: middle;
+      font-size: 14px;
+      line-height: 32px;
+      max-height: 32px;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: .1s ease-in-out;
+      transition-property: color, background-color, border-color
+    }
+
+    .space-between {
+      display: flex;
+      justify-content: space-between;
+      margin: 24px 0 0;
+    }
+  </style>
 </head>
 
 <body class="container">
 
-    <h1>indent.js</h1>
-    <h5><a href="https://github.com/zebzhao/indent.js">View On GitHub</a></h5>
+  <h1>indent.js</h1>
+  <h5>
+    <a href="https://github.com/zebzhao/indent.js">View On GitHub</a>
+  </h5>
 
-    <p>
-        Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying of your code, leave it as it is, only correctly indents it following some basic rules.
-    </p>
+  <p>
+    Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying
+    of your code, leave it as it is, only correctly indents it following some basic rules.
+  </p>
 
-    <p class="space-between">
-        <label>
-            Example
-            <select onchange="changeExample(this.options[this.selectedIndex].value)">
-                <optgroup label="JSX">
-                    <option value="jsx:class">JSX Class</option>
-                </optgroup>
-                <optgroup label="TSX">
-                    <option value="tsx:class">TSX Class</option>
-                </optgroup>
-                <optgroup label="HTML">
-                    <option value="html:">HTML</option>
-                </optgroup>
-                <optgroup label="SCSS">
-                    <option value="scss:">SCSS</option>
-                </optgroup>
-                <optgroup label="LESS">
-                    <option value="less:">LESS</option>
-                </optgroup>
-            </select>
-        </label>
+  <p class="space-between">
+    <label>
+      Example
+      <select onchange="changeExample(this.options[this.selectedIndex].value)">
+        <optgroup label="JSX">
+          <option value="jsx:class">JSX Class</option>
+        </optgroup>
+        <optgroup label="TSX">
+          <option value="tsx:class">TSX Class</option>
+        </optgroup>
+        <optgroup label="HTML">
+          <option value="html:">HTML</option>
+        </optgroup>
+        <optgroup label="SCSS">
+          <option value="scss:">SCSS</option>
+        </optgroup>
+        <optgroup label="LESS">
+          <option value="less:">LESS</option>
+        </optgroup>
+      </select>
+    </label>
 
-        <label>
-            &nbsp;
-            <button onclick="indentCode()">Indent</button>
-        </label>
+    <label>
+      &nbsp;
+      <button onclick="indentCode()">Indent</button>
+    </label>
 
-        <label>
-            Tab Size
-            <select onchange="changeTabSize(this.options[this.selectedIndex].value)">
-                <option value="2" selected>2</option>
-                <option value="4">4</option>
-                <option value="tab">Tab</option>
-            </select>
-        </label>
-    </p>
+    <label>
+      Tab Size
+      <select onchange="changeTabSize(this.options[this.selectedIndex].value)">
+        <option value="2" selected>2</option>
+        <option value="4">4</option>
+        <option value="tab">Tab</option>
+      </select>
+    </label>
+  </p>
 
-    <iframe id="editor" onload="init()" src="https://spck.io/embed/" frameBorder="0" width="100%" height="360">Browser not compatible.</iframe>
+  <iframe id="editor" onload="init()" src="https://spck.io/embed/" frameBorder="0" width="100%" height="360">Browser not compatible.</iframe>
 
-    <script src="js/indent.min.js"></script>
-    <script src="js/spck-embed.min.js"></script>
-    <script src="js/main.js"></script>
+  <script src="js/indent.min.js"></script>
+  <script src="js/spck-embed.min.js"></script>
+  <script src="js/main.js"></script>
 </body>
+
 </html>
