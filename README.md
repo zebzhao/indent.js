@@ -46,16 +46,33 @@ ES6/ES2015 Modules
 ```javascript
 import {indent} from 'indent.js';
 
-var indentedJs = indent.js(code, {tabString: '\t'});  // JSX as well
-var indentedTs = indent.ts(code, {tabString: '\t'});  // TSX as well
-var indentedCss = indent.css(code, {tabString: '\t'});
-var indentedHtml = indent.html(code, {tabString: '\t'});
+var indentedJs = indent.js(code);  // JSX as well
+var indentedTs = indent.ts(code);  // TSX as well
+var indentedCss = indent.css(code);
+var indentedHtml = indent.html(code);
 ```
 
 ## Projects using indent.js:
 
-1. [Spck.io - Private code editor for the web](https://spck.io/)
+1. [Spck Editor - Full-fledged code editor for the web](https://spck.io/)
 
+## API Reference
+
+### Methods
+
+```javascript
+js(code: String, options: Object): String
+ts(code: String, options: Object): String
+css(code: String, options: Object): String
+html(code: String, options: Object): String
+```
+
+#### Options
+
+|Field|Type|Description|
+|:--- |:--- |:--- |
+|`tabString`|`string`|String to indent the code with. Counts as 1 indent.|
+|`indentHtmlTag`|`bool`|Whether to indent contents inside `<html>` tag or not. Valid only for `html(...)`.|
 
 ## Languages still not supported:
 
