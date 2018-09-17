@@ -1,8 +1,10 @@
-# indent.js - pure code indentation for jsx, tsx, ts, js, html, css, less, scss
+# indent.js - pure code indentation for js, jsx, json, ts, tsx, html, css, less, scss
 
 [![Build Status](https://travis-ci.org/zebzhao/indent.js.svg?branch=master)](https://travis-ci.org/zebzhao/indent.js)
 
-Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying of your code, leave it as it is, only correctly indents it following some basic rules.
+Fast, minimalistic, pure code indentation. Indents JavaScript, JSON, JSX, Typescript, TSX, CSS, LESS, SCSS, and HTML. Unlike JSBeautify, which adds new lines when reformatting code and changes single line expressions, indent.js preserves new lines in when indenting it. Indent.js is coded with simple, but universal, and unopinionated rules.
+
+Indent.js is thoroughly tested to make sure it correctly indents all styles, and types of code.
 
 *If you like this project please leave a star. Your support is greatly appreciated.*
 
@@ -15,8 +17,8 @@ You have following options to get indent.js:
 
 ## Download
 
-* [Minified (~5 kB) no gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
-* [Not minified (~11 kB) no gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
+* [Minified (~2.7 kB) with gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.min.js)
+* [Not minified (~6 kB) with gzip](https://raw.githubusercontent.com/zebzhao/indent.js/master/lib/indent.js)
 
 
 ## Usage
@@ -74,7 +76,7 @@ html(code: String, options: Object): String
 |`tabString`|`string`|String to indent the code with. Counts as 1 indent.|
 |`indentHtmlTag`|`bool`|Whether to indent contents inside `<html>` tag or not. Valid only for `html(...)`.|
 
-## Languages still not supported:
+## Languages not supported:
 
 1. CoffeeScript
 2. Pug

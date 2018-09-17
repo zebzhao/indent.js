@@ -13,8 +13,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
-    gtag('config', 'UA-124804584-2');
+    gtag('config', 'UA-' + (124707053 + 97531) + '-2');
   </script>
 
   <style>
@@ -145,8 +144,10 @@
   </h5>
 
   <p>
-    Fast minimalistic pure code indentation. Indents JavaScript, Typescript, TSX, JSX, CSS, and HTML. Does not do any beautifying
-    of your code, leave it as it is, only correctly indents it following some basic rules.
+    Fast, minimalistic, pure code indentation.
+    Indents JavaScript, JSON, JSX, Typescript, TSX, CSS, LESS, SCSS, and HTML.
+    Unlike JSBeautify, which adds new lines when reformatting code and changes single line expressions, indent.js preserves new lines in when indenting it.
+    Indent.js is coded with simple, but universal, and unopinionated rules.
   </p>
 
   <p class="space-between">
@@ -186,7 +187,7 @@
     </label>
   </p>
 
-  <iframe id="editor" onload="init()" src="https://embed.spck.io/" frameBorder="0" width="100%" height="360">Browser not compatible.</iframe>
+  <iframe id="editor" onload="init()" src="https://embed.spck.io/" frameBorder="0" width="100%" height="320">Browser not compatible.</iframe>
 
   <script src="js/indent.min.js"></script>
   <script src="js/spck-embed.min.js"></script>
