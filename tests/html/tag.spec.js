@@ -16,4 +16,26 @@ describe('tag', function () {
     expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('tag with dot', function () {
+    var expected = `
+<Menu.Item>
+  <Menu.Item>
+  </Menu.Item>
+</Menu.Item>
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('tag with dash', function () {
+    var expected = `
+<Menu-Item>
+  <Menu-Item>
+  </Menu-Item>
+</Menu-Item>
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 });
