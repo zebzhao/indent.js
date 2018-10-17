@@ -24,4 +24,14 @@ class Main extends React.Component {
     expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('single tag', function () {
+    var expected = `
+var a = <x>
+  <note>everything {inside} the xml tags is treated as a literal string. /sadface</note>
+</x>
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  })
 });
