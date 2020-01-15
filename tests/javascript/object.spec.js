@@ -20,4 +20,20 @@ describe('object', function () {
     expect(sut(expected, {tabString: ts})).to.equal(
       expected.replace(/\r*\n/g, '\r\n'));
   });
+
+  it('empty object declaration', function () {
+    var expected = `
+{
+}
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
+  it('empty object with brackets', function () {
+    var expected = `({
+})`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
 });

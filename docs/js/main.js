@@ -169,11 +169,9 @@ for (var id in EXAMPLES) {
 }
 
 function init() {
-  editor.connect(function () {
+  editor.connect().then(function () {
     changeExample('jsx:class');
-  }, null, {
-    maxTries: 50
-  });
+  })
 }
 
 function multiline(f) {
@@ -185,9 +183,11 @@ function multiline(f) {
 
 function changeExample(id) {
   mode = id.split(':')[0];
-  editor.configure({
-    text: EXAMPLES[id],
-    mode: mode
+  editor.send({
+    editor: {
+      text: EXAMPLES[id],
+      mode: mode
+    }
   });
 }
 
@@ -198,13 +198,13 @@ function changeTabSize(size) {
     'tab': 4
   };
   tabSize = size;
-  editor.configure({
-    tabSize: tabSizeMap[size]
+  editor.send({
+    editor: {tabSize: tabSizeMap[size]}
   });
 }
 
 function indentCode() {
-  editor.getText(function (e) {
+  editor.getText().then(function (text) {
     var modeMap = {
       'less': 'css',
       'scss': 'css',
@@ -218,8 +218,10 @@ function indentCode() {
       '4': '    ',
       'tab': '\t'
     };
-    editor.configure({
-      text: indent[modeMap[mode]](e.data, {tabString: tabStringMap[tabSize]})
+    return editor.send({
+      editor: {
+        text: indent[modeMap[mode]](text, {tabString: tabStringMap[tabSize]})
+      }
     });
   });
 }

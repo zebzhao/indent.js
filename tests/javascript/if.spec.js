@@ -16,6 +16,18 @@ if (a)
       expected.replace(/\r*\n/g, '\r\n'));
   });
 
+  it('if: single line with object and comment', function () {
+    var expected = `
+if (a) // Test
+  b = {
+    c: 0,
+    d: 1
+  }
+`;
+    expect(sut(expected, {tabString: ts})).to.equal(
+      expected.replace(/\r*\n/g, '\r\n'));
+  });
+
   it('if: single line', function () {
     var expected = `
 if (a)
