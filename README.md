@@ -46,7 +46,7 @@ console.log(indented);
 
 ES6/ES2015 Modules
 ```javascript
-import indent from 'indent.js';
+import { indent } from 'indent.js';
 
 var indentedJs = indent.js(code);  // JSX as well
 var indentedTs = indent.ts(code);  // TSX as well
